@@ -1,15 +1,15 @@
 [package]
-name = "reap-grep"
+name = "mov-find"
 version = "0.0.1"
 edition = "2018"
 authors = ["Roben Kleene <contact@robenkleene.com>"]
-description = "wgrep/write-grep CLI"
+description = "Rename files from find results."
 readme = "README.md"
-keywords = ["sed", "find", "replace", "regex", "grep"]
+keywords = ["rename", "find", "replace", "regex", "grep"]
 license = "MIT"
-homepage = "https://github.com/robenkleene/reap"
-repository = "https://github.com/robenkleene/reap.git"
-categories = ["command-line-utilities", "text-processing", "development-tools"]
+homepage = "https://github.com/robenkleene/mov-find"
+repository = "https://github.com/robenkleene/mov-find.git"
+categories = ["command-line-utilities", "development-tools"]
 
 [dependencies]
 regex = "1.4.3"
