@@ -377,6 +377,31 @@ dependencies = [
 ]
 
 [[package]]
+name = "mov-find"
+version = "0.0.1"
+dependencies = [
+ "ansi_term",
+ "anyhow",
+ "assert_cmd",
+ "atty",
+ "ctrlc",
+ "diffy-fork-filenames",
+ "globwalk",
+ "grep-cli",
+ "ignore",
+ "indexmap",
+ "man",
+ "memmap",
+ "rayon",
+ "regex",
+ "shell-words",
+ "structopt",
+ "tempfile",
+ "thiserror",
+ "unescape",
+]
+
+[[package]]
 name = "nix"
 version = "0.26.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -509,31 +534,6 @@ dependencies = [
  "crossbeam-deque",
  "crossbeam-utils",
  "num_cpus",
-]
-
-[[package]]
-name = "mov"
-version = "0.0.1"
-dependencies = [
- "ansi_term",
- "anyhow",
- "assert_cmd",
- "atty",
- "ctrlc",
- "diffy-fork-filenames",
- "globwalk",
- "grep-cli",
- "ignore",
- "indexmap",
- "man",
- "memmap",
- "rayon",
- "regex",
- "shell-words",
- "structopt",
- "tempfile",
- "thiserror",
- "unescape",
 ]
 
 [[package]]
