@@ -45,7 +45,7 @@ fn main() -> Result<()> {
             options.literal_mode,
             options.flags,
             options.replacements,
-        ))
+        )?)
         .run(!options.write, color, pager)?;
     }
     process::exit(0);
