@@ -3,11 +3,11 @@ use std::io::prelude::*;
 use std::fs::File;
 
 pub(crate) struct App {
-    replacer: Option<Replacer>
+    replacer: Replacer
 }
 
 impl App {
-    pub(crate) fn new(replacer: Option<Replacer>) -> Self {
+    pub(crate) fn new(replacer: Replacer) -> Self {
         Self { replacer }
     }
 
@@ -31,11 +31,11 @@ impl App {
                 Ok(path_to_edits) => {
                     if preview {
                         for (path, edits) in path_to_edits {
-                            let patcher = Patcher::new(edits, self.replacer.as_ref());
+                            let patcher = Patcher::new(edits, self.replacer);
                             if let Err(_) = Self::check_not_empty(File::open(&path)?) {
                                 continue // FIXME:
                             }
-                            let writer = Writer::new(path.to_path_buf(), &patcher);
+                            let writer = Writer::new(path.to_path_buf(), patcher);
                             let text = match writer.patch_preview(color) {
                                 Ok(text) => text,
                                 Err(_) => continue, // FIXME:
@@ -45,11 +45,11 @@ impl App {
                         }
                     } else {
                         for (path, edits) in path_to_edits {
-                            let patcher = Patcher::new(edits, self.replacer.as_ref());
+                            let patcher = Patcher::new(edits, self.replacer);
                             if let Err(_) = Self::check_not_empty(File::open(&path)?) {
                                 return Ok(()); // FIXME:
                             }
-                            let writer = Writer::new(path, &patcher);
+                            let writer = Writer::new(path, patcher);
                             if let Err(_) = writer.write_file() {
                                 return Ok(()); // FIXME:
                             }

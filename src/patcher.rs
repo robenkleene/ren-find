@@ -4,9 +4,9 @@ use std::convert::TryFrom;
 use std::convert::TryInto;
 use std::str;
 
-pub(crate) struct Patcher<'a> {
+pub(crate) struct Patcher {
     edits: Vec<Edit>,
-    replacer: Option<&'a Replacer>
+    replacer: Replacer,
 }
 
 #[derive(Debug, thiserror::Error)]
@@ -15,8 +15,8 @@ pub enum Error {
     LineNumber,
 }
 
-impl<'a> Patcher<'a> {
-    pub(crate) fn new(edits: Vec<Edit>, replacer: Option<&'a Replacer>) -> Self {
+impl<'a> Patcher {
+    pub(crate) fn new(edits: Vec<Edit>, replacer: Replacer) -> Self {
         Self { edits, replacer }
     }
 
@@ -28,17 +28,13 @@ impl<'a> Patcher<'a> {
             if index >= lines.len().try_into().unwrap() {
                 return Err(Error::LineNumber);
             }
-            if let Some(replacer) = &self.replacer {
-                let replaced = &replacer.replace(edit.text.as_bytes());
-                let result = str::from_utf8(replaced);
-                let text = match result {
-                    Ok(result) => result,
-                    Err(err) => panic!("Error replacing: {}", err), // FIXME:
-                };
-                lines[index] = text.to_string();
-            } else {
-                lines[index] = edit.text.clone();
-            }
+            let replaced = self.replacer.replace(edit.text.as_bytes());
+            let result = str::from_utf8(&replaced);
+            let text = match result {
+                Ok(result) => result,
+                Err(err) => panic!("Error replacing: {}", err), // FIXME:
+            };
+            lines[index] = text.to_string();
         }
         return Ok(lines.join("\n"));
     }
@@ -51,18 +47,21 @@ mod tests {
 
     #[test]
     fn patch_bad_number() {
-        let patcher = Patcher::new(vec![
-            Edit {
-                file: PathBuf::from("f"),
-                number: 1,
-                text: "foo".to_string(),
-            },
-            Edit {
-                file: PathBuf::from("f"),
-                number: 3,
-                text: "bar".to_string(),
-            },
-        ], None);
+        let patcher = Patcher::new(
+            vec![
+                Edit {
+                    file: PathBuf::from("f"),
+                    number: 1,
+                    text: "foo".to_string(),
+                },
+                Edit {
+                    file: PathBuf::from("f"),
+                    number: 3,
+                    text: "bar".to_string(),
+                },
+            ],
+            None,
+        );
         let lines = vec!["a".to_string(), "b".to_string()];
         let result = patcher.patch(lines);
         assert!(matches!(result, Err(Error::LineNumber)));
@@ -70,18 +69,21 @@ mod tests {
 
     #[test]
     fn patch() {
-        let patcher = Patcher::new(vec![
-            Edit {
-                file: PathBuf::from("f"),
-                number: 2,
-                text: "foo".to_string(),
-            },
-            Edit {
-                file: PathBuf::from("f"),
-                number: 3,
-                text: "bar".to_string(),
-            },
-        ], None);
+        let patcher = Patcher::new(
+            vec![
+                Edit {
+                    file: PathBuf::from("f"),
+                    number: 2,
+                    text: "foo".to_string(),
+                },
+                Edit {
+                    file: PathBuf::from("f"),
+                    number: 3,
+                    text: "bar".to_string(),
+                },
+            ],
+            None,
+        );
         let lines = vec!["a".to_string(), "b".to_string(), "c".to_string()];
         let result = patcher.patch(lines);
         assert!(result.is_ok());

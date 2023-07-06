@@ -4,9 +4,9 @@ use diffy_fork_filenames::{create_file_patch, PatchFormatter};
 
 pub type Result<T, E = Error> = std::result::Result<T, E>;
 
-pub(crate) struct Writer<'a> {
+pub(crate) struct Writer {
     path: PathBuf,
-    patcher: &'a Patcher<'a>,
+    patcher: Patcher,
 }
 
 #[derive(Debug, thiserror::Error)]
@@ -19,8 +19,8 @@ pub enum Error {
     TempfilePersist(#[from] tempfile::PersistError),
 }
 
-impl<'a> Writer<'a> {
-    pub(crate) fn new(path: PathBuf, patcher: &'a Patcher) -> Self {
+impl Writer {
+    pub(crate) fn new(path: PathBuf, patcher: Patcher) -> Self {
         Self { path, patcher }
     }
 
