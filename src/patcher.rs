@@ -60,7 +60,13 @@ mod tests {
                     text: "bar".to_string(),
                 },
             ],
-            None,
+            &Replacer::new(
+                String::from(""),
+                String::from(""),
+                true,
+                None,
+                None,
+            ).expect("Error creating replacer"),
         );
         let lines = vec!["a".to_string(), "b".to_string()];
         let result = patcher.patch(lines);
@@ -82,7 +88,13 @@ mod tests {
                     text: "bar".to_string(),
                 },
             ],
-            None,
+            &Replacer::new(
+                String::from(""),
+                String::from(""),
+                true,
+                None,
+                None,
+            ).expect("Error creating replacer"),
         );
         let lines = vec!["a".to_string(), "b".to_string(), "c".to_string()];
         let result = patcher.patch(lines);
