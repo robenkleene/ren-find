@@ -1,11 +1,11 @@
-use crate::patcher::Patcher;
-use std::{fs, fs::File, io::prelude::*, path::PathBuf, io::BufReader};
-use diffy_fork_filenames::{create_file_patch, PatchFormatter};
+use crate::replacer::Replacer;
+use std::{fs, fs::File, io::prelude::*, path::PathBuf};
+use diffy_fork_filenames::PatchFormatter;
 
 pub type Result<T, E = Error> = std::result::Result<T, E>;
 
 pub(crate) struct Writer<'a> {
-    path: PathBuf,
+    paths: Vec<PathBuf>,
     replacer: &'a Replacer<'a>,
 }
 
