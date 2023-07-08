@@ -1,7 +1,6 @@
 use crate::{edit::Edit, output::OutputType, patcher::Patcher, writer::Writer, Replacer, Result};
 use std::fs::File;
 use std::io::prelude::*;
-use std::str;
 
 pub(crate) struct App {
     replacer: Replacer,
