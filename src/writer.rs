@@ -25,15 +25,15 @@ impl<'a> Writer<'a> {
     }
 
     pub(crate) fn patch_preview(&self, color: bool) -> Result<String, crate::writer::Error> {
-        let original = paths.join("\n");
         let modified_lines = Vec::new();
-        for path in paths {
+        for path in self.paths {
             let replaced = self.replacer.replace(path.to_string_lossy().as_bytes());
-            let result = str::from_utf8(&replaced);
+            let result = std::str::from_utf8(&replaced)?;
             modified_lines.push(result);
         }
-        let modified = modified_lines.join("\n");
 
+        let modified = modified_lines.join("\n");
+        let original = self.paths.to_string_lossy().join("\n");
         let patch = create_patch(&original, &modified);
         let f = match color {
             true => PatchFormatter::new().with_color(),
@@ -43,9 +43,9 @@ impl<'a> Writer<'a> {
     }
 
     pub(crate) fn write_file(&self) -> Result<()> {
-        for path in paths {
+        for path in self.paths {
             let replaced = self.replacer.replace(path.to_string_lossy().as_bytes());
-            let result = str::from_utf8(&replaced);
+            let result = std::str::from_utf8(&replaced);
             fs::rename(path, result)?;
         }
         Ok(())
