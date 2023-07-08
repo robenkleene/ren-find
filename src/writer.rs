@@ -42,38 +42,6 @@ impl<'a> Writer<'a> {
     }
 
     pub(crate) fn write_file(&self) -> Result<()> {
-        use memmap::{Mmap, MmapMut};
-        use std::ops::DerefMut;
-
-        let source = File::open(self.path.clone())?;
-        let meta = fs::metadata(self.path.clone())?;
-        let mmap_source = unsafe { Mmap::map(&source)? };
-        let lines = mmap_source.lines()
-            .map(|l| l.expect("Error getting line"))
-            .collect();
-        let replaced = match self.patcher.patch(lines) {
-            Ok(replaced) => replaced,
-            Err(_) => panic!("Error patching lines"), // FIXME:
-        };
-
-        let target = tempfile::NamedTempFile::new_in(
-            self.path.parent()
-                .ok_or_else(|| Error::InvalidPath(self.path.to_path_buf()))?,
-        )?;
-        let file = target.as_file();
-        file.set_len(replaced.len() as u64)?;
-        file.set_permissions(meta.permissions())?;
-
-        if !replaced.is_empty() {
-            let mut mmap_target = unsafe { MmapMut::map_mut(&file)? };
-            mmap_target.deref_mut().write_all(&replaced.as_bytes())?;
-            mmap_target.flush_async()?;
-        }
-
-        drop(mmap_source);
-        drop(source);
-
-        target.persist(fs::canonicalize(self.path.clone())?)?;
         Ok(())
     }
 }
