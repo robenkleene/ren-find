@@ -47,6 +47,13 @@ mod tests {
 
     #[test]
     fn patch_bad_number() {
+        let replacer = Replacer::new(
+                String::from(""),
+                String::from(""),
+                true,
+                None,
+                None,
+            ).expect("Error creating replacer");
         let patcher = Patcher::new(
             vec![
                 Edit {
@@ -60,7 +67,7 @@ mod tests {
                     text: "bar".to_string(),
                 },
             ],
-            None,
+            &replacer,
         );
         let lines = vec!["a".to_string(), "b".to_string()];
         let result = patcher.patch(lines);
@@ -69,6 +76,13 @@ mod tests {
 
     #[test]
     fn patch() {
+        let replacer = Replacer::new(
+                String::from(""),
+                String::from(""),
+                true,
+                None,
+                None,
+            ).expect("Error creating replacer");
         let patcher = Patcher::new(
             vec![
                 Edit {
@@ -82,7 +96,7 @@ mod tests {
                     text: "bar".to_string(),
                 },
             ],
-            None,
+            &replacer,
         );
         let lines = vec!["a".to_string(), "b".to_string(), "c".to_string()];
         let result = patcher.patch(lines);

@@ -17,6 +17,7 @@ mod cli {
         mov()
             .current_dir("tests/data/markdown")
             .write_stdin(input)
+            .args(&["", ""])
             .assert()
             .success()
             .stdout(result);
@@ -30,6 +31,7 @@ mod cli {
         mov()
             .current_dir("tests/data/simple")
             .write_stdin(input)
+            .args(&["", ""])
             .assert()
             .success()
             .stdout(result);
@@ -43,6 +45,7 @@ mod cli {
         mov()
             .current_dir("tests/data/files")
             .write_stdin(input)
+            .args(&["", ""])
             .assert()
             .success()
             .stdout(result);
