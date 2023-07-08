@@ -28,8 +28,9 @@ impl<'a> Writer<'a> {
         let original = paths.join("\n");
         let modified_lines = Vec::new();
         for path in paths {
-            let replaced = self.replacer.replace(path);
-            modified_lines.push(replaced);
+            let replaced = self.replacer.replace(path.to_string_lossy().as_bytes());
+            let result = str::from_utf8(&replaced);
+            modified_lines.push(result);
         }
         let modified = modified_lines.join("\n");
 

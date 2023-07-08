@@ -31,29 +31,17 @@ impl App {
             match Edit::parse(handle) {
                 Ok(paths) => {
                     if preview {
-                        for path in paths {
-                            let patcher = Patcher::new(edits, &self.replacer);
-                            let replaced = self.replacer.replace(path.to_string_lossy().as_bytes());
-                            let result = str::from_utf8(&replaced);
-                            // TODO: Verify that each file is valid
-                            let writer = Writer::new(path.to_path_buf(), &patcher);
-                            let text = match writer.patch_preview(color) {
-                                Ok(text) => text,
-                                Err(_) => continue, // FIXME:
-                            };
+                        let writer = Writer::new(paths, &replacer);
+                        let text = match writer.patch_preview(color) {
+                            Ok(text) => text,
+                            Err(_) => continue, // FIXME:
+                        };
 
-                            write!(write, "{}", text)?;
-                        }
+                        write!(write, "{}", text)?;
                     } else {
-                        for path in paths {
-                            let patcher = Patcher::new(edits, &self.replacer);
-                            if let Err(_) = Self::check_not_empty(File::open(&path)?) {
-                                return Ok(()); // FIXME:
-                            }
-                            let writer = Writer::new(path, &patcher);
-                            if let Err(_) = writer.write_file() {
-                                return Ok(()); // FIXME:
-                            }
+                        let writer = Writer::new(paths, &replacer);
+                        if let Err(_) = writer.write_file() {
+                            return Ok(()); // FIXME:
                         }
                     }
                 }
