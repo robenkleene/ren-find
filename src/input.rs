@@ -1,4 +1,4 @@
-use crate::{output::OutputType,  writer::Writer, Replacer, Result};
+use crate::{edit::Edit, output::OutputType,  writer::Writer, Replacer, Result};
 use std::fs::File;
 use std::io::prelude::*;
 
