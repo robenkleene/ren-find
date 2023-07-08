@@ -1,5 +1,5 @@
 use crate::replacer::Replacer;
-use std::{fs, fs::File, io::prelude::*, path::PathBuf};
+use std::{fs, io::prelude::*, path::PathBuf};
 use diffy_fork_filenames::PatchFormatter;
 
 pub type Result<T, E = Error> = std::result::Result<T, E>;
@@ -43,6 +43,11 @@ impl<'a> Writer<'a> {
     }
 
     pub(crate) fn write_file(&self) -> Result<()> {
+        for path in paths {
+            let replaced = self.replacer.replace(path.to_string_lossy().as_bytes());
+            let result = str::from_utf8(&replaced);
+            fs::rename(path, result)?;
+        }
         Ok(())
     }
 }
