@@ -6,7 +6,7 @@ pub type Result<T, E = Error> = std::result::Result<T, E>;
 
 pub(crate) struct Writer<'a> {
     path: PathBuf,
-    patcher: &'a Patcher<'a>,
+    replacer: &'a Replacer<'a>,
 }
 
 #[derive(Debug, thiserror::Error)]
@@ -20,29 +20,20 @@ pub enum Error {
 }
 
 impl<'a> Writer<'a> {
-    pub(crate) fn new(path: PathBuf, patcher: &'a Patcher) -> Self {
-        Self { path, patcher }
+    pub(crate) fn new(paths: Vec<PathBuf>, replacer: &'a Replacer) -> Self {
+        Self { paths, replacer }
     }
 
     pub(crate) fn patch_preview(&self, color: bool) -> Result<String, crate::writer::Error> {
-        // TODO: Review error handling
-        let file = File::open(self.path.clone()).expect("Error opening file");
-        let buf = BufReader::new(file);
-        let lines: Vec<String> = buf.lines()
-            .map(|l| l.expect("Error getting line"))
-            .collect();
-        let original = lines.join("\n");
-        let modified = match self.patcher.patch(lines) {
-            Ok(replaced) => replaced,
-            Err(err) => panic!("Error patching lines: {}", err), // FIXME:
-        };
-        let filename = match self.path.to_str() {
-            Some(filename) => filename,
-            None => return Err(Error::InvalidPath(self.path.clone())),
-        };
-        let original_filename = format!("a/{}", filename);
-        let modified_filename = format!("b/{}", filename);
-        let patch = create_file_patch(&original, &modified, original_filename.as_str(), modified_filename.as_str());
+        let original = paths.join("\n");
+        let modified_lines = Vec::new();
+        for path in paths {
+            let replaced = self.replacer.replace(path);
+            modified_lines.push(replaced);
+        }
+        let modified = modified_lines.join("\n");
+
+        let patch = create_patch(&original, &modified);
         let f = match color {
             true => PatchFormatter::new().with_color(),
             false => PatchFormatter::new(),
