@@ -1,9 +1,10 @@
-use crate::{Replacer, Result, edit::Edit, patcher::Patcher, writer::Writer, output::OutputType};
-use std::io::prelude::*;
+use crate::{edit::Edit, output::OutputType, patcher::Patcher, writer::Writer, Replacer, Result};
 use std::fs::File;
+use std::io::prelude::*;
+use std::str;
 
 pub(crate) struct App {
-    replacer: Replacer
+    replacer: Replacer,
 }
 
 impl App {
@@ -28,13 +29,13 @@ impl App {
             };
 
             match Edit::parse(handle) {
-                Ok(path_to_edits) => {
+                Ok(paths) => {
                     if preview {
-                        for (path, edits) in path_to_edits {
+                        for path in paths {
                             let patcher = Patcher::new(edits, &self.replacer);
-                            if let Err(_) = Self::check_not_empty(File::open(&path)?) {
-                                continue // FIXME:
-                            }
+                            let replaced = self.replacer.replace(path.to_string_lossy().as_bytes());
+                            let result = str::from_utf8(&replaced);
+                            // TODO: Verify that each file is valid
                             let writer = Writer::new(path.to_path_buf(), &patcher);
                             let text = match writer.patch_preview(color) {
                                 Ok(text) => text,
@@ -44,7 +45,7 @@ impl App {
                             write!(write, "{}", text)?;
                         }
                     } else {
-                        for (path, edits) in path_to_edits {
+                        for path in paths {
                             let patcher = Patcher::new(edits, &self.replacer);
                             if let Err(_) = Self::check_not_empty(File::open(&path)?) {
                                 return Ok(()); // FIXME:
@@ -55,10 +56,10 @@ impl App {
                             }
                         }
                     }
-                },
+                }
                 Err(_) => {
                     return Ok(()); // FIXME:
-                },
+                }
             }
             drop(write);
         }
