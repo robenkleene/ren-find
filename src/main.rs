@@ -1,9 +1,7 @@
 mod cli;
-mod edit;
 mod error;
 mod input;
 mod output;
-mod patcher;
 mod writer;
 // FIXME: Look at `pub(crate)` calls are all these necessary?
 mod less;
