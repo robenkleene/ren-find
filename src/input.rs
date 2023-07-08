@@ -31,15 +31,14 @@ impl App {
             match Edit::parse(handle) {
                 Ok(paths) => {
                     if preview {
-                        let writer = Writer::new(paths, &replacer);
+                        let writer = Writer::new(paths, &self.replacer);
                         let text = match writer.patch_preview(color) {
                             Ok(text) => text,
-                            Err(_) => continue, // FIXME:
+                            Err(_) => return Ok(()), // FIXME:
                         };
-
                         write!(write, "{}", text)?;
                     } else {
-                        let writer = Writer::new(paths, &replacer);
+                        let writer = Writer::new(paths, &self.replacer);
                         if let Err(_) = writer.write_file() {
                             return Ok(()); // FIXME:
                         }
