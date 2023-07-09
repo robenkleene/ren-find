@@ -53,8 +53,10 @@ impl<'a> Writer<'a> {
     }
 
     pub(crate) fn write_file(&self) -> Result<()> {
-        for path in self.paths {
-            let replaced = self.replacer.replace(path.to_string_lossy().as_bytes());
+        for path in &self.paths {
+            let path_string = path.to_string_lossy();
+            let path_bytes = path_string.as_bytes();
+            let replaced = self.replacer.replace(path_bytes);
             let result = std::str::from_utf8(&replaced)?;
             fs::rename(path, result)?;
         }
