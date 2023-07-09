@@ -27,7 +27,7 @@ impl<'a> Writer<'a> {
     }
 
     pub(crate) fn patch_preview(&self, color: bool) -> Result<String, crate::writer::Error> {
-        let mut modified_lines = Vec::new();
+        let mut modified_lines: Vec<String> = Vec::new();
         for path in &self.paths {
             let path_string = path.to_string_lossy();
             let path_bytes = path_string.as_bytes();
@@ -36,7 +36,7 @@ impl<'a> Writer<'a> {
               Ok(result) => result,
               Err(err) => return Err(Error::String(err))
             };
-            modified_lines.push(result);
+            modified_lines.push(result.to_string());
         }
 
         let modified = modified_lines.join("\n");
