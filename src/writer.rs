@@ -40,7 +40,7 @@ impl<'a> Writer<'a> {
         }
 
         let modified = modified_lines.join("\n");
-        let original: String  = self.paths.into_iter()
+        let original: String  = self.paths.clone().into_iter()
             .map(|p| p.to_string_lossy())
             .collect::<Vec<std::borrow::Cow<str>>>()
             .join("\n");
