@@ -2,13 +2,6 @@ use std::path::PathBuf;
 use std::io::StdinLock;
 use std::io::prelude::*;
 
-#[derive(Debug)]
-#[derive(thiserror::Error)]
-pub enum Error {
-  #[error("No file, number, and text matches")]
-  Match,
-}
-
 pub(crate) struct Edit { }
 
 impl Edit {
