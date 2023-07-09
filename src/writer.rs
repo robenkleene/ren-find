@@ -15,6 +15,8 @@ pub enum Error {
     InvalidPath(std::path::PathBuf),
     #[error(transparent)]
     File(#[from] std::io::Error),
+    #[error(transparent)]
+    String(#[from] std::str::Utf8Error),
     #[error("failed to move file: {0}")]
     TempfilePersist(#[from] tempfile::PersistError),
 }
@@ -28,7 +30,10 @@ impl<'a> Writer<'a> {
         let modified_lines = Vec::new();
         for path in self.paths {
             let replaced = self.replacer.replace(path.to_string_lossy().as_bytes());
-            let result = std::str::from_utf8(&replaced)?;
+            let result = match std::str::from_utf8(&replaced) {
+              Ok(result) => result,
+              Err(err) => return Err(Error::String(err))
+            };
             modified_lines.push(result);
         }
 
