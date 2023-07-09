@@ -27,9 +27,10 @@ impl<'a> Writer<'a> {
     }
 
     pub(crate) fn patch_preview(&self, color: bool) -> Result<String, crate::writer::Error> {
-        let modified_lines = Vec::new();
-        for path in self.paths {
-            let replaced = self.replacer.replace(path.to_string_lossy().as_bytes());
+        let mut modified_lines = Vec::new();
+        for path in &self.paths {
+            let path_string = path.to_string_lossy().as_bytes();
+            let replaced = self.replacer.replace(path_string);
             let result = match std::str::from_utf8(&replaced) {
               Ok(result) => result,
               Err(err) => return Err(Error::String(err))
@@ -38,9 +39,9 @@ impl<'a> Writer<'a> {
         }
 
         let modified = modified_lines.join("\n");
-        let original = self.paths.into_iter()
+        let original: String  = self.paths.into_iter()
             .map(|p| p.to_string_lossy())
-            .collect()
+            .collect::<Vec<std::borrow::Cow<str>>>()
             .join("\n");
         let patch = create_patch(&original, &modified);
         let f = match color {
