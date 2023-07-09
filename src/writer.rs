@@ -29,8 +29,9 @@ impl<'a> Writer<'a> {
     pub(crate) fn patch_preview(&self, color: bool) -> Result<String, crate::writer::Error> {
         let mut modified_lines = Vec::new();
         for path in &self.paths {
-            let path_string = path.to_string_lossy().as_bytes();
-            let replaced = self.replacer.replace(path_string);
+            let path_string = path.to_string_lossy();
+            let path_bytes = path_string.as_bytes();
+            let replaced = self.replacer.replace(path_bytes);
             let result = match std::str::from_utf8(&replaced) {
               Ok(result) => result,
               Err(err) => return Err(Error::String(err))
