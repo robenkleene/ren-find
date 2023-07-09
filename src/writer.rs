@@ -41,8 +41,8 @@ impl<'a> Writer<'a> {
 
         let modified = modified_lines.join("\n");
         let original: String  = self.paths.clone().into_iter()
-            .map(|p| p.to_string_lossy())
-            .collect::<Vec<std::borrow::Cow<str>>>()
+            .map(|p| p.to_string_lossy().to_string())
+            .collect::<Vec<String>>()
             .join("\n");
         let patch = create_patch(&original, &modified);
         let f = match color {
