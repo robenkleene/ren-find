@@ -4,4 +4,4 @@ set -euo pipefail
 
 cd "$(dirname "$0")" || exit 1
 
-diff start.txt finish.txt > patch.patch
+diff --unified start.txt <(sed s/changes/altered/g start.txt) > patch.patch
