@@ -1,5 +1,5 @@
---- a/original.txt
-+++ b/original.txt
+--- original
++++ modified
 @@ -1,6 +1,6 @@
  stays stays
 -stays changes
