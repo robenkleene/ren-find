@@ -54,7 +54,7 @@ mod cli {
 
     #[test]
     fn patch_preview_files_args() -> Result<()> {
-        let input = fs::read_to_string("tests/data/files/grep.txt").expect("Error reading input");
+        let input = fs::read_to_string("tests/data/files/start.txt").expect("Error reading input");
         let result = fs::read_to_string("tests/data/files/patch.patch").expect("Error reading input");
         mov()
             .current_dir("tests/data/files")
