@@ -1,5 +1,5 @@
---- start.txt	2023-07-10 05:34:57
-+++ /dev/fd/63	2023-07-10 05:37:25
+--- a/original.txt
++++ b/original.txt
 @@ -1,6 +1,6 @@
  stays stays
 -stays changes
