@@ -1,5 +1,11 @@
---- a/original.txt
-+++ b/original.txt
-@@ -1 +1 @@
--Who put the bomp in the bomp bah bomp bah bomp
-+Who put the ram in the ram bah ram bah ram
+--- original
++++ modified
+@@ -1,5 +1,5 @@
+ stays stays
+-stays changes
++stays altered
+ stays
+-changes stays
+-changes stays changes
++altered stays
++altered stays altered

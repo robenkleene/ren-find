@@ -4,12 +4,12 @@ set -euo pipefail
 
 cd "$(dirname "$0")" || exit 1
 
-grep --line-number --with-filename bomp original.txt > grep.txt
-diff --unified original.txt \
-  <(sed s/bomp/ram/g original.txt) > patch.patch || true
-sed -i '' 's/bomp/ram/g' grep.txt
-sed -i '' '1s/.*/--- a\/original.txt/' patch.patch
-sed -i '' '2s/.*/+++ b\/original.txt/' patch.patch
-sed -i '' '3s/-1,2 +1,2/-1 +1/' patch.patch
-sed -i '' '6d' patch.patch
-wc -l < grep.txt | xargs > grep-count.txt
+diff --unified start.txt <(sed s/changes/altered/g start.txt) > patch.patch || true
+sed -i.bak '1s/.*/--- original/' patch.patch
+sed -i.bak '2s/.*/+++ modified/' patch.patch
+
+sed -i.bak '3s#.*#@@ -1,5 +1,5 @@#' patch.patch
+sed -i.bak '12d' patch.patch
+
+rm patch.patch.bak
+
