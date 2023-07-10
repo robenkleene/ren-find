@@ -1,9 +1,9 @@
-use crate::{Replacer, Result, edit::Edit, patcher::Patcher, writer::Writer, output::OutputType};
-use std::io::prelude::*;
+use crate::{edit::Edit, output::OutputType,  writer::Writer, Replacer, Result};
 use std::fs::File;
+use std::io::prelude::*;
 
 pub(crate) struct App {
-    replacer: Replacer
+    replacer: Replacer,
 }
 
 impl App {
@@ -28,37 +28,24 @@ impl App {
             };
 
             match Edit::parse(handle) {
-                Ok(path_to_edits) => {
+                Ok(paths) => {
                     if preview {
-                        for (path, edits) in path_to_edits {
-                            let patcher = Patcher::new(edits, &self.replacer);
-                            if let Err(_) = Self::check_not_empty(File::open(&path)?) {
-                                continue // FIXME:
-                            }
-                            let writer = Writer::new(path.to_path_buf(), &patcher);
-                            let text = match writer.patch_preview(color) {
-                                Ok(text) => text,
-                                Err(_) => continue, // FIXME:
-                            };
-
-                            write!(write, "{}", text)?;
-                        }
+                        let writer = Writer::new(paths, &self.replacer);
+                        let text = match writer.patch_preview(color) {
+                            Ok(text) => text,
+                            Err(_) => return Ok(()), // FIXME:
+                        };
+                        write!(write, "{}", text)?;
                     } else {
-                        for (path, edits) in path_to_edits {
-                            let patcher = Patcher::new(edits, &self.replacer);
-                            if let Err(_) = Self::check_not_empty(File::open(&path)?) {
-                                return Ok(()); // FIXME:
-                            }
-                            let writer = Writer::new(path, &patcher);
-                            if let Err(_) = writer.write_file() {
-                                return Ok(()); // FIXME:
-                            }
+                        let writer = Writer::new(paths, &self.replacer);
+                        if let Err(_) = writer.write_file() {
+                            return Ok(()); // FIXME:
                         }
                     }
-                },
+                }
                 Err(_) => {
                     return Ok(()); // FIXME:
-                },
+                }
             }
             drop(write);
         }

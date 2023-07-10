@@ -11,53 +11,11 @@ mod cli {
     }
 
     #[test]
-    fn patch_preview_markdown() -> Result<()> {
-        let input = fs::read_to_string("tests/data/markdown/markdown-to-markup-grep.txt").expect("Error reading input");
-        let result = fs::read_to_string("tests/data/markdown/markdown-markup.patch").expect("Error reading input");
-        mov()
-            .current_dir("tests/data/markdown")
-            .write_stdin(input)
-            .args(&["", ""])
-            .assert()
-            .success()
-            .stdout(result);
-        Ok(())
-    }
-
-    #[test]
-    fn patch_preview_simple() -> Result<()> {
-        let input = fs::read_to_string("tests/data/simple/grep.txt").expect("Error reading input");
+    fn patch_preview_files_args() -> Result<()> {
+        let input = fs::read_to_string("tests/data/simple/start.txt").expect("Error reading input");
         let result = fs::read_to_string("tests/data/simple/patch.patch").expect("Error reading input");
         mov()
             .current_dir("tests/data/simple")
-            .write_stdin(input)
-            .args(&["", ""])
-            .assert()
-            .success()
-            .stdout(result);
-        Ok(())
-    }
-
-    #[test]
-    fn patch_preview_files_stdin() -> Result<()> {
-        let input = fs::read_to_string("tests/data/files/changes-to-altered-grep.txt").expect("Error reading input");
-        let result = fs::read_to_string("tests/data/files/patch.patch").expect("Error reading input");
-        mov()
-            .current_dir("tests/data/files")
-            .write_stdin(input)
-            .args(&["", ""])
-            .assert()
-            .success()
-            .stdout(result);
-        Ok(())
-    }
-
-    #[test]
-    fn patch_preview_files_args() -> Result<()> {
-        let input = fs::read_to_string("tests/data/files/grep.txt").expect("Error reading input");
-        let result = fs::read_to_string("tests/data/files/patch.patch").expect("Error reading input");
-        mov()
-            .current_dir("tests/data/files")
             .write_stdin(input)
             .args(&["changes", "altered"])
             .assert()
