@@ -35,19 +35,11 @@ impl<'a> Writer<'a> {
               Err(err) => return Err(Error::String(err))
             };
             let dst = PathBuf::from(result);
-            if *path != dst {
-                if !path.is_file() && !path.is_dir() {
-                    eprintln!("Skipping {} because it doesn't exist", path.display());
-                    continue
-                }
-                if dst.is_file() || dst.is_dir() {
-                    eprintln!("Skipping {} because {} already exists", path.display(), dst.display());
-                    continue
-                }
+            if *path != dst && !Self::check(path.to_path_buf(), dst) {
+                continue;
             }
             modified_lines.push(result.to_string());
         }
-
         let modified = modified_lines.join("\n");
         let original: String  = self.paths.clone().into_iter()
             .map(|p| p.to_string_lossy().to_string())
@@ -67,8 +59,24 @@ impl<'a> Writer<'a> {
             let path_bytes = path_string.as_bytes();
             let replaced = self.replacer.replace(path_bytes);
             let result = std::str::from_utf8(&replaced)?;
+            let dst = PathBuf::from(result);
+            if *path == dst || !Self::check(path.to_path_buf(), dst) {
+                continue;
+            }
             fs::rename(path, result)?;
         }
         Ok(())
+    }
+
+    fn check(src: PathBuf, dst: PathBuf) -> bool {
+        if !src.is_file() && !src.is_dir() {
+            eprintln!("Skipping {} because it doesn't exist", src.display());
+            return false;
+        }
+        if dst.is_file() || dst.is_dir() {
+            eprintln!("Skipping {} because {} already exists", src.display(), dst.display());
+            return false;
+        }
+        return true;
     }
 }
