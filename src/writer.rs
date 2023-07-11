@@ -34,14 +34,16 @@ impl<'a> Writer<'a> {
               Ok(result) => result,
               Err(err) => return Err(Error::String(err))
             };
-            if !path.is_file() && !path.is_dir() {
-                eprintln!("Skipping {} because it doesn't exist", path.display());
-                continue
-            }
             let dst = PathBuf::from(result);
-            if dst.is_file() || dst.is_dir() {
-                eprintln!("Skipping {} because {} already exists", path.display(), dst.display());
-                continue
+            if *path != dst {
+                if !path.is_file() && !path.is_dir() {
+                    eprintln!("Skipping {} because it doesn't exist", path.display());
+                    continue
+                }
+                if dst.is_file() || dst.is_dir() {
+                    eprintln!("Skipping {} because {} already exists", path.display(), dst.display());
+                    continue
+                }
             }
             modified_lines.push(result.to_string());
         }
