@@ -26,6 +26,7 @@ impl<'a> Writer<'a> {
 
     pub(crate) fn patch_preview(&self, color: bool) -> Result<String, crate::writer::Error> {
         let mut modified_lines: Vec<String> = Vec::new();
+        let mut print_diff = false;
         for path in &self.paths {
             let path_string = path.to_string_lossy();
             let path_bytes = path_string.as_bytes();
@@ -40,7 +41,11 @@ impl<'a> Writer<'a> {
                 modified_lines.push(path_string.to_string());
                 continue;
             }
+            print_diff = true;
             modified_lines.push(result.to_string());
+        }
+        if !print_diff {
+            return Ok("".to_string());
         }
         let modified = modified_lines.join("\n");
         let original: String  = self.paths.clone().into_iter()
