@@ -36,6 +36,8 @@ impl<'a> Writer<'a> {
             };
             let dst = PathBuf::from(result);
             if *path != dst && !Self::check(path.to_path_buf(), dst) {
+                // Always add unmodified lines to illustrate that those files will not be moved
+                modified_lines.push(path_string.to_string());
                 continue;
             }
             modified_lines.push(result.to_string());
