@@ -23,4 +23,17 @@ mod cli {
             .stdout(result);
         Ok(())
     }
+
+    #[test]
+    fn patch_preview_missing() -> Result<()> {
+        let input = fs::read_to_string("tests/data/simple/start.txt").expect("Error reading input");
+        mov()
+            .current_dir("tests/data/missing")
+            .write_stdin(input)
+            .args(&["missing", "replaced"])
+            .assert()
+            .success()
+            .stdout("");
+        Ok(())
+    }
 }
