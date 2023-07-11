@@ -11,8 +11,6 @@ pub(crate) struct Writer<'a> {
 
 #[derive(Debug, thiserror::Error)]
 pub enum Error {
-    #[error("Invalid path")]
-    InvalidPath(std::path::PathBuf),
     #[error(transparent)]
     File(#[from] std::io::Error),
     #[error(transparent)]
@@ -29,6 +27,10 @@ impl<'a> Writer<'a> {
     pub(crate) fn patch_preview(&self, color: bool) -> Result<String, crate::writer::Error> {
         let mut modified_lines: Vec<String> = Vec::new();
         for path in &self.paths {
+            if !path.is_file() && !path.is_dir() {
+                eprintln!("Skipping {} because it doesn't exist", path.display());
+                continue
+            }
             let path_string = path.to_string_lossy();
             let path_bytes = path_string.as_bytes();
             let replaced = self.replacer.replace(path_bytes);
@@ -36,6 +38,11 @@ impl<'a> Writer<'a> {
               Ok(result) => result,
               Err(err) => return Err(Error::String(err))
             };
+            let dst = PathBuf::from(result);
+            if dst.is_file() || dst.is_dir() {
+                eprintln!("Skipping {} because {} already exists", path.display(), dst.display());
+                continue
+            }
             modified_lines.push(result.to_string());
         }
 
