@@ -7,7 +7,7 @@ mod cli {
     use std::fs;
 
     fn mov() -> Command {
-        Command::cargo_bin(env!("CARGO_PKG_NAME")).expect("Error invoking mov")
+        Command::cargo_bin("mov").expect("Error invoking mov")
     }
 
     #[test]
