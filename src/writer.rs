@@ -36,10 +36,9 @@ impl<'a> Writer<'a> {
               Err(err) => return Err(Error::String(err))
             };
             let dst = PathBuf::from(result);
-            if *path != dst && !Self::check(path.to_path_buf(), dst) {
-                // Always add unmodified lines to illustrate that those files will not be moved
+            if *path == dst || (*path != dst && !Self::check(path.to_path_buf(), dst)) {
                 modified_lines.push(path_string.to_string());
-                continue;
+                continue
             }
             print_diff = true;
             modified_lines.push(result.to_string());
