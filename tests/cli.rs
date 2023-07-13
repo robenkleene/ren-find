@@ -40,13 +40,14 @@ mod cli {
     #[test]
     fn recursive_dirs() -> Result<()> {
         let input = fs::read_to_string("tests/data/dirs/find.txt").expect("Error reading input");
+        let result = fs::read_to_string("tests/data/simple/patch.patch").expect("Error reading input");
         mov()
             .current_dir("tests/data/dirs")
             .write_stdin(input)
             .args(&["changes", "altered"])
             .assert()
             .success()
-            .stdout("");
+            .stdout(result);
         Ok(())
     }
 }
