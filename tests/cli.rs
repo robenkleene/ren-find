@@ -7,7 +7,7 @@ mod cli {
     use std::fs;
 
     fn mov() -> Command {
-        Command::cargo_bin(env!("CARGO_PKG_NAME")).expect("Error invoking mov")
+        Command::cargo_bin("mov").expect("Error invoking mov")
     }
 
     #[test]
@@ -16,6 +16,33 @@ mod cli {
         let result = fs::read_to_string("tests/data/simple/patch.patch").expect("Error reading input");
         mov()
             .current_dir("tests/data/simple")
+            .write_stdin(input)
+            .args(&["changes", "altered"])
+            .assert()
+            .success()
+            .stdout(result);
+        Ok(())
+    }
+
+    #[test]
+    fn patch_preview_missing() -> Result<()> {
+        let input = fs::read_to_string("tests/data/simple/start.txt").expect("Error reading input");
+        mov()
+            .current_dir("tests/data/missing")
+            .write_stdin(input)
+            .args(&["missing", "replaced"])
+            .assert()
+            .success()
+            .stdout("");
+        Ok(())
+    }
+
+    #[test]
+    fn recursive_dirs() -> Result<()> {
+        let input = fs::read_to_string("tests/data/dirs/find.txt").expect("Error reading input");
+        let result = fs::read_to_string("tests/data/dirs/patch.patch").expect("Error reading input");
+        mov()
+            .current_dir("tests/data/dirs")
             .write_stdin(input)
             .args(&["changes", "altered"])
             .assert()

@@ -11,6 +11,10 @@ homepage = "https://github.com/robenkleene/mov-find"
 repository = "https://github.com/robenkleene/mov-find.git"
 categories = ["command-line-utilities", "development-tools"]
 
+[[bin]]
+name = "mov"
+path = "src/main.rs"
+
 [dependencies]
 regex = "1.4.3"
 structopt = "0.3.21"
