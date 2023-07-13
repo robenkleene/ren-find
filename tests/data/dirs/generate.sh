@@ -9,4 +9,4 @@ sed -i.bak '1s/.*/--- original/' patch.patch
 sed -i.bak '2s/.*/+++ modified/' patch.patch
 
 rm patch.patch.bak
-
+truncate -s -1 patch.patch
