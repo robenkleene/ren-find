@@ -58,8 +58,8 @@ mod cli {
     #[test]
     fn test_move() -> Result<()> {
         let input = fs::read_to_string("tests/data/move/find.txt").expect("Error reading input");
-        let file_path_component = "tests/data/mov/change dir with spaces/change dir with spaces two/change file with spaces";
-        let file_path = Path::new("tests/data/mov").join(file_path_component);
+        let file_path_component = "change dir with spaces/change dir with spaces two/change file with spaces";
+        let file_path = Path::new("tests/data/move").join(file_path_component);
         let tmp_dir = tempfile::tempdir()?;
         let tmp_dir_path = tmp_dir.path();
         let file_path_dst = tmp_dir_path.join(file_path_component);
