@@ -70,8 +70,10 @@ mod cli {
             .args(&["change", "altered", "-w"])
             .assert()
             .success();
-        // TODO: Test src is missing
-        // TODO; Test dst exist
+        assert!(!Path::exists(&file_path_dst));
+        let file_path_component_moved = "tests/data/mov/altered dir with spaces/altered dir with spaces two/altered file with spaces";
+        let file_path_moved = tmp_dir_path.join(file_path_component_moved);
+        assert!(Path::exists(&file_path_moved));
         Ok(())
     }
 }
