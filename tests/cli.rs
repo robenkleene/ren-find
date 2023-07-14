@@ -63,6 +63,8 @@ mod cli {
         let tmp_dir = tempfile::tempdir()?;
         let tmp_dir_path = tmp_dir.path();
         let file_path_dst = tmp_dir_path.join(file_path_component);
+        let prefix = file_path_dst.parent().unwrap();
+        std::fs::create_dir_all(prefix).unwrap();
         fs::copy(file_path, &file_path_dst).expect("Error copying file");
         mov()
             .current_dir(tmp_dir_path)
