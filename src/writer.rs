@@ -69,6 +69,8 @@ impl<'a> Writer<'a> {
             if *path == dst || !Self::check(path.to_path_buf(), dst) {
                 continue;
             }
+            println!("path = {:?}", path);
+            println!("result = {:?}", result);
             if let Err(err) = fs::rename(path, result) {
                 eprintln!("Error: failed to move '{}' to '{}', underlying error: {}", path.display(), result, err);
             }
