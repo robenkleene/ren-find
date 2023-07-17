@@ -70,7 +70,7 @@ impl<'a> Writer<'a> {
                 continue;
             }
             if let Err(err) = fs::rename(path, result) {
-                eprintln!("Error: failed to move {} to {}, {}", path.display(), result, err);
+                eprintln!("Error: failed to move '{}' to '{}', underlying error: {}", path.display(), result, err);
             }
         }
         Ok(())
