@@ -16,10 +16,10 @@ mod cli {
 
     #[test]
     fn patch_preview_files_args() -> Result<()> {
-        let input = fs::read_to_string("tests/data/simple/start.txt").expect("Error reading input");
-        let result = fs::read_to_string("tests/data/simple/patch.patch").expect("Error reading input");
+        let input = fs::read_to_string("tests/data/multiple/start.txt").expect("Error reading input");
+        let result = fs::read_to_string("tests/data/multiple/patch.patch").expect("Error reading input");
         mov()
-            .current_dir("tests/data/simple")
+            .current_dir("tests/data/multiple")
             .write_stdin(input)
             .args(&["changes", "altered"])
             .assert()
@@ -30,7 +30,7 @@ mod cli {
 
     #[test]
     fn patch_preview_missing() -> Result<()> {
-        let input = fs::read_to_string("tests/data/simple/start.txt").expect("Error reading input");
+        let input = fs::read_to_string("tests/data/multiple/start.txt").expect("Error reading input");
         mov()
             .current_dir("tests/data/missing")
             .write_stdin(input)
