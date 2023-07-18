@@ -69,10 +69,19 @@ impl<'a> Writer<'a> {
             if *path == dst || !Self::check(path.to_path_buf(), dst) {
                 continue;
             }
+
+            let dir = std::env::current_dir()?;
             println!("path = {:?}", path);
             println!("result = {:?}", result);
+            println!("dir = {:?}", dir);
+            assert!(!std::path::Path::exists(&path));
             if let Err(err) = fs::rename(path, result) {
-                eprintln!("Error: failed to move '{}' to '{}', underlying error: {}", path.display(), result, err);
+                eprintln!(
+                    "Error: failed to move '{}' to '{}', underlying error: {}",
+                    path.display(),
+                    result,
+                    err
+                );
             }
         }
         Ok(())
