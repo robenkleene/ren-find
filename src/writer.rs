@@ -1,6 +1,6 @@
 use crate::replacer::Replacer;
-use std::{fs, path::PathBuf};
 use diffy_fork_filenames::{create_patch, PatchFormatter};
+use std::{fs, path::PathBuf};
 
 pub type Result<T, E = Error> = std::result::Result<T, E>;
 
@@ -32,13 +32,13 @@ impl<'a> Writer<'a> {
             let path_bytes = path_string.as_bytes();
             let replaced = self.replacer.replace(path_bytes);
             let result = match std::str::from_utf8(&replaced) {
-              Ok(result) => result,
-              Err(err) => return Err(Error::String(err))
+                Ok(result) => result,
+                Err(err) => return Err(Error::String(err)),
             };
             let dst = PathBuf::from(result);
             if *path == dst || (*path != dst && !Self::check(path.to_path_buf(), dst)) {
                 modified_lines.push(path_string.to_string());
-                continue
+                continue;
             }
             print_diff = true;
             modified_lines.push(result.to_string());
@@ -47,7 +47,10 @@ impl<'a> Writer<'a> {
             return Ok("".to_string());
         }
         let modified = modified_lines.join("\n");
-        let original: String  = self.paths.clone().into_iter()
+        let original: String = self
+            .paths
+            .clone()
+            .into_iter()
             .map(|p| p.to_string_lossy().to_string())
             .collect::<Vec<String>>()
             .join("\n");
@@ -93,7 +96,11 @@ impl<'a> Writer<'a> {
             return false;
         }
         if dst.is_file() || dst.is_dir() {
-            eprintln!("Skipping {} because {} already exists", src.display(), dst.display());
+            eprintln!(
+                "Skipping {} because {} already exists",
+                src.display(),
+                dst.display()
+            );
             return false;
         }
         return true;
