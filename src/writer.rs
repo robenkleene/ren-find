@@ -64,6 +64,11 @@ impl<'a> Writer<'a> {
 
     pub(crate) fn write_file(&self) -> Result<()> {
         for path in &self.paths {
+            // TODO
+            // 1. Get the filename from the path
+            // 2. Do the rename on just the filename
+            // 3. Adding the renamed file to the directory
+            // Result is the new destination
             let path_string = path.to_string_lossy();
             let path_bytes = path_string.as_bytes();
             let replaced = self.replacer.replace(path_bytes);

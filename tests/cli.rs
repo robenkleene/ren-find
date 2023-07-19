@@ -90,6 +90,7 @@ mod cli {
         let prefix = file_path_dst.parent().unwrap();
         std::fs::create_dir_all(prefix).unwrap();
         fs::copy(file_path, &file_path_dst).expect("Error copying file");
+        assert!(Path::exists(&file_path_dst)); // FIXME: Remember to delete this
         let command = mov()
             .current_dir(tmp_dir_path)
             .write_stdin(input)
