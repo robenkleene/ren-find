@@ -56,10 +56,37 @@ mod cli {
     }
 
     #[test]
-    fn test_move() -> Result<()> {
-        let input = fs::read_to_string("tests/data/move/find.txt").expect("Error reading input");
+    fn test_simple_move() -> Result<()> {
+        let input = fs::read_to_string("tests/data/simple/find.txt").expect("Error reading input");
+        let file_path_component = "changes";
+        let file_path = Path::new("tests/data/simple").join(file_path_component);
+        let tmp_dir = tempfile::tempdir()?;
+        let tmp_dir_path = tmp_dir.path();
+        let file_path_dst = tmp_dir_path.join(file_path_component);
+        let prefix = file_path_dst.parent().unwrap();
+        std::fs::create_dir_all(prefix).unwrap();
+        fs::copy(file_path, &file_path_dst).expect("Error copying file");
+        let command = mov()
+            .current_dir(tmp_dir_path)
+            .write_stdin(input)
+            .args(&["change", "altered", "-w"])
+            .assert()
+            .success();
+        let output = command.get_output();
+        println!("stdout = {:?}", String::from_utf8_lossy(&output.stdout));
+        println!("stderr = {:?}", String::from_utf8_lossy(&output.stderr));
+        assert!(!Path::exists(&file_path_dst));
+        let file_path_component_moved = "altered";
+        let file_path_moved = tmp_dir_path.join(file_path_component_moved);
+        assert!(Path::exists(&file_path_moved));
+        Ok(())
+    }
+
+    #[test]
+    fn test_nested_move() -> Result<()> {
+        let input = fs::read_to_string("tests/data/nested/find.txt").expect("Error reading input");
         let file_path_component = "change dir with spaces/change dir with spaces two/change file with spaces";
-        let file_path = Path::new("tests/data/move").join(file_path_component);
+        let file_path = Path::new("tests/data/nested").join(file_path_component);
         let tmp_dir = tempfile::tempdir()?;
         let tmp_dir_path = tmp_dir.path();
         let file_path_dst = tmp_dir_path.join(file_path_component);
