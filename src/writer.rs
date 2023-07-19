@@ -77,7 +77,7 @@ impl<'a> Writer<'a> {
             println!("path = {:?}", path);
             println!("result = {:?}", result);
             println!("dir = {:?}", dir);
-            assert!(std::path::Path::exists(&path));
+            assert!(std::path::Path::exists(&path)); // FIXME: Remember to delete this
             if let Err(err) = fs::rename(path, result) {
                 eprintln!(
                     "Error: failed to move '{}' to '{}', underlying error: {}",
