@@ -66,15 +66,12 @@ mod cli {
         let prefix = file_path_dst.parent().unwrap();
         std::fs::create_dir_all(prefix).unwrap();
         fs::copy(file_path, &file_path_dst).expect("Error copying file");
-        let command = mov()
+        mov()
             .current_dir(tmp_dir_path)
             .write_stdin(input)
             .args(&["changes", "altered", "-w"])
             .assert()
             .success();
-        let output = command.get_output();
-        println!("stdout = {:?}", String::from_utf8_lossy(&output.stdout));
-        println!("stderr = {:?}", String::from_utf8_lossy(&output.stderr));
         assert!(!Path::exists(&file_path_dst));
         let file_path_component_moved = "altered";
         let file_path_moved = tmp_dir_path.join(file_path_component_moved);
