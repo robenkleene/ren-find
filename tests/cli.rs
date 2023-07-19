@@ -69,7 +69,7 @@ mod cli {
         let command = mov()
             .current_dir(tmp_dir_path)
             .write_stdin(input)
-            .args(&["change", "altered", "-w"])
+            .args(&["changes", "altered", "-w"])
             .assert()
             .success();
         let output = command.get_output();
