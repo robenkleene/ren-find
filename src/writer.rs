@@ -64,18 +64,11 @@ impl<'a> Writer<'a> {
 
     pub(crate) fn write_file(&self) -> Result<()> {
         for path in &self.paths {
-            let filename = path.file_name().unwrap();
-            let filename_string = filename.to_string_lossy();
-            let filename_bytes = filename_string.as_bytes();
-            let filename_replaced = self.replacer.replace(filename_bytes);
-            let filename_replaced_string = std::str::from_utf8(&filename_replaced)?;
-            let filename_dir = path.parent().unwrap();
-            let dst_path = filename_dir.join(filename_replaced_string);
-            let dst = PathBuf::from(dst_path);
+            let dst = self.replace_path(path)?;
             if *path == dst || !Self::check(&path.to_path_buf(), &dst) {
                 continue;
             }
-            if let Err(err) = fs::rename(path, filename_replaced_string) {
+            if let Err(err) = fs::rename(path, &dst) {
                 eprintln!(
                     "Error: failed to move '{}' to '{}', underlying error: {}",
                     path.display(),
@@ -101,5 +94,16 @@ impl<'a> Writer<'a> {
             return false;
         }
         return true;
+    }
+
+    fn replace_path(&self, path: &PathBuf) -> Result<PathBuf, Error> {
+        let filename = path.file_name().unwrap();
+        let filename_string = filename.to_string_lossy();
+        let filename_bytes = filename_string.as_bytes();
+        let filename_replaced = self.replacer.replace(filename_bytes);
+        let filename_replaced_string = std::str::from_utf8(&filename_replaced)?;
+        let filename_dir = path.parent().unwrap();
+        let dst_path = filename_dir.join(filename_replaced_string);
+        Ok(PathBuf::from(dst_path))
     }
 }
