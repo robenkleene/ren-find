@@ -36,7 +36,7 @@ impl<'a> Writer<'a> {
                 Err(err) => return Err(Error::String(err)),
             };
             let dst = PathBuf::from(result);
-            if *path == dst || (*path != dst && !Self::check(path.to_path_buf(), dst)) {
+            if *path == dst || (*path != dst && !Self::check(&path.to_path_buf(), &dst)) {
                 modified_lines.push(path_string.to_string());
                 continue;
             }
@@ -64,30 +64,22 @@ impl<'a> Writer<'a> {
 
     pub(crate) fn write_file(&self) -> Result<()> {
         for path in &self.paths {
-            // TODO
-            // 1. Get the filename from the path
-            // 2. Do the rename on just the filename
-            // 3. Adding the renamed file to the directory
-            // Result is the new destination
-            let path_string = path.to_string_lossy();
-            let path_bytes = path_string.as_bytes();
-            let replaced = self.replacer.replace(path_bytes);
-            let result = std::str::from_utf8(&replaced)?;
-            let dst = PathBuf::from(result);
-            if *path == dst || !Self::check(path.to_path_buf(), dst) {
+            let filename = path.file_name().unwrap();
+            let filename_string = filename.to_string_lossy();
+            let filename_bytes = filename_string.as_bytes();
+            let filename_replaced = self.replacer.replace(filename_bytes);
+            let filename_replaced_string = std::str::from_utf8(&filename_replaced)?;
+            let filename_dir = path.parent().unwrap();
+            let dst_path = filename_dir.join(filename_replaced_string);
+            let dst = PathBuf::from(dst_path);
+            if *path == dst || !Self::check(&path.to_path_buf(), &dst) {
                 continue;
             }
-
-            let dir = std::env::current_dir()?;
-            println!("path = {:?}", path);
-            println!("result = {:?}", result);
-            println!("dir = {:?}", dir);
-            assert!(std::path::Path::exists(&path)); // FIXME: Remember to delete this
-            if let Err(err) = fs::rename(path, result) {
+            if let Err(err) = fs::rename(path, filename_replaced_string) {
                 eprintln!(
                     "Error: failed to move '{}' to '{}', underlying error: {}",
                     path.display(),
-                    result,
+                    &dst.display(),
                     err
                 );
             }
@@ -95,7 +87,7 @@ impl<'a> Writer<'a> {
         Ok(())
     }
 
-    fn check(src: PathBuf, dst: PathBuf) -> bool {
+    fn check(src: &PathBuf, dst: &PathBuf) -> bool {
         if !src.is_file() && !src.is_dir() {
             eprintln!("Skipping {} because it doesn't exist", src.display());
             return false;
