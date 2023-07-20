@@ -28,20 +28,14 @@ impl<'a> Writer<'a> {
         let mut modified_lines: Vec<String> = Vec::new();
         let mut print_diff = false;
         for path in &self.paths {
-            let path_string = path.to_string_lossy();
-            let path_bytes = path_string.as_bytes();
-            let replaced = self.replacer.replace(path_bytes);
-            let result = match std::str::from_utf8(&replaced) {
-                Ok(result) => result,
-                Err(err) => return Err(Error::String(err)),
-            };
-            let dst = PathBuf::from(result);
+            let dst = self.replace_path(path)?;
             if *path == dst || (*path != dst && !Self::check(&path.to_path_buf(), &dst)) {
+                let path_string = path.to_string_lossy();
                 modified_lines.push(path_string.to_string());
                 continue;
             }
             print_diff = true;
-            modified_lines.push(result.to_string());
+            modified_lines.push(dst.to_string_lossy().to_string());
         }
         if !print_diff {
             return Ok("".to_string());
