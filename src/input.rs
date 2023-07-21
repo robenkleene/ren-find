@@ -51,10 +51,4 @@ impl App {
         }
         Ok(())
     }
-
-    pub(crate) fn check_not_empty(mut file: File) -> Result<()> {
-        let mut buf: [u8; 1] = Default::default();
-        file.read_exact(&mut buf)?;
-        Ok(())
-    }
 }
