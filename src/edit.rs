@@ -15,6 +15,5 @@ impl Edit {
         }
         return Ok(paths);
     }
-
 }
 
