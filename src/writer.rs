@@ -20,7 +20,7 @@ pub enum Error {
 }
 
 impl Writer {
-    pub(crate) fn new(paths: Vec<PathBuf>, src_to_dst: IndexMap<PathBuf, PathBuf) -> Self {
+    pub(crate) fn new(paths: Vec<PathBuf>, src_to_dst: IndexMap<PathBuf, PathBuf>) -> Self {
         Self { paths, src_to_dst }
     }
 
