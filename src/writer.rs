@@ -6,7 +6,7 @@ pub type Result<T, E = Error> = std::result::Result<T, E>;
 
 pub(crate) struct Writer {
     paths: Vec<PathBuf>,
-    src_to_dst: <IndexMap<PathBuf, PathBuf>,
+    src_to_dst: IndexMap<PathBuf, PathBuf>,
 }
 
 #[derive(Debug, thiserror::Error)]
@@ -20,7 +20,7 @@ pub enum Error {
 }
 
 impl Writer {
-    pub(crate) fn new(paths: Vec<PathBuf>, src_to_dst: <IndexMap<PathBuf, PathBuf>) -> Self {
+    pub(crate) fn new(paths: Vec<PathBuf>, src_to_dst: IndexMap<PathBuf, PathBuf) -> Self {
         Self { paths, src_to_dst }
     }
 
@@ -58,7 +58,7 @@ impl Writer {
 
     pub(crate) fn write_file(&self) -> Result<()> {
         for path in &self.paths {
-            let dst = self.replace_path(path)?;
+            let dst = self.src_to_dst[path];
             if *path == dst || !Self::check(&path.to_path_buf(), &dst) {
                 continue;
             }
