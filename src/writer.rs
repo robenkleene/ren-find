@@ -1,12 +1,12 @@
-use crate::replacer::Replacer;
 use diffy_fork_filenames::{create_patch, PatchFormatter};
+use indexmap::IndexMap;
 use std::{fs, path::PathBuf};
 
 pub type Result<T, E = Error> = std::result::Result<T, E>;
 
-pub(crate) struct Writer<'a> {
+pub(crate) struct Writer {
     paths: Vec<PathBuf>,
-    replacer: &'a Replacer,
+    src_to_dst: <IndexMap<PathBuf, PathBuf>,
 }
 
 #[derive(Debug, thiserror::Error)]
@@ -19,28 +19,28 @@ pub enum Error {
     TempfilePersist(#[from] tempfile::PersistError),
 }
 
-impl<'a> Writer<'a> {
-    pub(crate) fn new(paths: Vec<PathBuf>, replacer: &'a Replacer) -> Self {
-        Self { paths, replacer }
+impl Writer {
+    pub(crate) fn new(paths: Vec<PathBuf>, src_to_dst: <IndexMap<PathBuf, PathBuf>) -> Self {
+        Self { paths, src_to_dst }
     }
 
     pub(crate) fn patch_preview(&self, color: bool) -> Result<String, crate::writer::Error> {
-        let mut modified_lines: Vec<String> = Vec::new();
+        let mut modified_paths: Vec<String> = Vec::new();
         let mut print_diff = false;
         for path in &self.paths {
-            let dst = self.replace_path(path)?;
+            let dst = self.src_to_dst[path];
             if *path == dst || (*path != dst && !Self::check(&path.to_path_buf(), &dst)) {
                 let path_string = path.to_string_lossy();
-                modified_lines.push(path_string.to_string());
+                modified_paths.push(path_string.to_string());
                 continue;
             }
             print_diff = true;
-            modified_lines.push(dst.to_string_lossy().to_string());
+            modified_paths.push(dst.to_string_lossy().to_string());
         }
         if !print_diff {
             return Ok("".to_string());
         }
-        let modified = modified_lines.join("\n");
+        let modified = modified_paths.join("\n");
         let original: String = self
             .paths
             .clone()
@@ -88,16 +88,5 @@ impl<'a> Writer<'a> {
             return false;
         }
         return true;
-    }
-
-    fn replace_path(&self, path: &PathBuf) -> Result<PathBuf, Error> {
-        let filename = path.file_name().unwrap();
-        let filename_string = filename.to_string_lossy();
-        let filename_bytes = filename_string.as_bytes();
-        let filename_replaced = self.replacer.replace(filename_bytes);
-        let filename_replaced_string = std::str::from_utf8(&filename_replaced)?;
-        let filename_dir = path.parent().unwrap();
-        let dst_path = filename_dir.join(filename_replaced_string);
-        Ok(PathBuf::from(dst_path))
     }
 }
