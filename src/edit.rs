@@ -1,7 +1,5 @@
 use crate::replacer::Replacer;
 use indexmap::IndexMap;
-use std::io::prelude::*;
-use std::io::StdinLock;
 use std::path::PathBuf;
 
 #[derive(Debug, thiserror::Error)]
@@ -18,11 +16,10 @@ impl<'a> Edit<'a> {
 
     pub(crate) fn parse(
         self,
-        reader: StdinLock<'_>,
+        paths: Vec<PathBuf>,
     ) -> Result<IndexMap<PathBuf, PathBuf>, Error> {
         let mut src_to_dst = IndexMap::new();
-        for line in reader.lines() {
-            let path = PathBuf::from(line?);
+        for path in paths {
             let dst = self.replace_path(&path)?;
             src_to_dst.insert(path, path);
         }

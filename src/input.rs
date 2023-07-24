@@ -1,6 +1,6 @@
 use crate::{edit::Edit, output::OutputType, writer::Writer, Replacer, Result};
-use std::fs::File;
 use std::io::prelude::*;
+use std::path::PathBuf;
 
 pub(crate) struct App {
     replacer: Replacer,
@@ -27,17 +27,25 @@ impl App {
                 Err(_) => return Ok(()), // FIXME:
             };
 
-            match Edit::parse(handle) {
-                Ok(paths) => {
+
+            let mut paths = Vec::new();
+            for line in handle.lines() {
+                let path = PathBuf::from(line?);
+                paths.push(path);
+            }
+            let sorted_paths = paths.sort_by(|a, b| b.to_str().unwrap().len().cmp(&a.to_str().unwrap().len()));
+            let edit = Edit::new(&self.replacer);
+            match edit.parse(sorted_paths) {
+                Ok(src_to_dst) => {
                     if preview {
-                        let writer = Writer::new(paths, &self.replacer);
+                        let writer = Writer::new(paths, src_to_dst);
                         let text = match writer.patch_preview(color) {
                             Ok(text) => text,
                             Err(_) => return Ok(()), // FIXME:
                         };
                         write!(write, "{}", text)?;
                     } else {
-                        let writer = Writer::new(paths, &self.replacer);
+                        let writer = Writer::new(sorted_paths, src_to_dst);
                         if let Err(_) = writer.write_file() {
                             return Ok(()); // FIXME:
                         }
