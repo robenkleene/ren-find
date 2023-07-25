@@ -20,7 +20,7 @@ impl<'a> Edit<'a> {
 
     pub(crate) fn parse(
         self,
-        paths: Vec<PathBuf>,
+        paths: &Vec<PathBuf>,
     ) -> Result<IndexMap<PathBuf, PathBuf>, Error> {
         let mut src_to_dst = IndexMap::new();
         for path in paths {
@@ -28,7 +28,7 @@ impl<'a> Edit<'a> {
               Ok(result) => result,
               Err(err) => return Err(Error::ReplaceError(err)),
             };
-            src_to_dst.insert(path, dst);
+            src_to_dst.insert(path.clone(), dst);
         }
         return Ok(src_to_dst);
     }

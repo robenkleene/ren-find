@@ -36,7 +36,7 @@ impl App {
             let mut sorted_paths = paths.clone();
             sorted_paths.sort_by(|a, b| b.to_str().unwrap().len().cmp(&a.to_str().unwrap().len()));
             let edit = Edit::new(&self.replacer);
-            match edit.parse(sorted_paths) {
+            match edit.parse(&sorted_paths) {
                 Ok(src_to_dst) => {
                     if preview {
                         let writer = Writer::new(paths, src_to_dst);
