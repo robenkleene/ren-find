@@ -1,4 +1,5 @@
 use crate::replacer::Replacer;
+use std::str::Utf8Error;
 use indexmap::IndexMap;
 use std::path::PathBuf;
 
@@ -26,7 +27,7 @@ impl<'a> Edit<'a> {
         return Ok(src_to_dst);
     }
 
-    fn replace_path(&self, path: &PathBuf) -> Result<PathBuf, Error> {
+    fn replace_path(&self, path: &PathBuf) -> Result<PathBuf, Utf8Error> {
         let filename = path.file_name().unwrap();
         let filename_string = filename.to_string_lossy();
         let filename_bytes = filename_string.as_bytes();
