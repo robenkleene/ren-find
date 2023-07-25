@@ -4,7 +4,10 @@ use indexmap::IndexMap;
 use std::path::PathBuf;
 
 #[derive(Debug, thiserror::Error)]
-pub enum Error {}
+pub enum Error {
+    #[error("Replace failed")]
+    ReplaceError(Utf8Error),
+}
 
 pub(crate) struct Edit<'a> {
     replacer: &'a Replacer,
@@ -21,8 +24,11 @@ impl<'a> Edit<'a> {
     ) -> Result<IndexMap<PathBuf, PathBuf>, Error> {
         let mut src_to_dst = IndexMap::new();
         for path in paths {
-            let dst = self.replace_path(&path)?;
-            src_to_dst.insert(path, path);
+            let dst = match self.replace_path(&path) {
+              Ok(result) => result,
+              Err(err) => return Err(Error::ReplaceError(err)),
+            };
+            src_to_dst.insert(path, dst);
         }
         return Ok(src_to_dst);
     }
