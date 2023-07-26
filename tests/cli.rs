@@ -5,17 +5,14 @@ mod cli {
     use anyhow::Result;
     use assert_cmd::Command;
     use std::fs;
-    use std::fs::File;
-    use std::path::{Path, PathBuf};
-    use std::io::Read;
-    use std::io::Seek;
+    use std::path::Path;
 
     fn mov() -> Command {
         Command::cargo_bin("mov").expect("Error invoking mov")
     }
 
     #[test]
-    fn patch_preview_files_args() -> Result<()> {
+    fn multiple_preview() -> Result<()> {
         let input = fs::read_to_string("tests/data/multiple/start.txt").expect("Error reading input");
         let result = fs::read_to_string("tests/data/multiple/patch.patch").expect("Error reading input");
         mov()
@@ -29,8 +26,8 @@ mod cli {
     }
 
     #[test]
-    fn patch_preview_missing() -> Result<()> {
-        let input = fs::read_to_string("tests/data/multiple/start.txt").expect("Error reading input");
+    fn missing_preview() -> Result<()> {
+        let input = fs::read_to_string("tests/data/missing/start.txt").expect("Error reading input");
         mov()
             .current_dir("tests/data/missing")
             .write_stdin(input)
@@ -42,7 +39,35 @@ mod cli {
     }
 
     #[test]
-    fn recursive_dirs() -> Result<()> {
+    fn simple_preview() -> Result<()> {
+        let input = fs::read_to_string("tests/data/simple/find.txt").expect("Error reading input");
+        let result = fs::read_to_string("tests/data/simple/patch.patch").expect("Error reading input");
+        mov()
+            .current_dir("tests/data/simple")
+            .write_stdin(input)
+            .args(&["changes", "altered"])
+            .assert()
+            .success()
+            .stdout(result);
+        Ok(())
+    }
+
+    #[test]
+    fn nested_preview() -> Result<()> {
+        let input = fs::read_to_string("tests/data/nested/find.txt").expect("Error reading input");
+        let result = fs::read_to_string("tests/data/nested/patch.patch").expect("Error reading input");
+        mov()
+            .current_dir("tests/data/nested")
+            .write_stdin(input)
+            .args(&["changes", "altered"])
+            .assert()
+            .success()
+            .stdout(result);
+        Ok(())
+    }
+
+    #[test]
+    fn dirs_preview() -> Result<()> {
         let input = fs::read_to_string("tests/data/dirs/find.txt").expect("Error reading input");
         let result = fs::read_to_string("tests/data/dirs/patch.patch").expect("Error reading input");
         mov()
@@ -56,7 +81,7 @@ mod cli {
     }
 
     #[test]
-    fn test_simple_move() -> Result<()> {
+    fn simple_move() -> Result<()> {
         let input = fs::read_to_string("tests/data/simple/find.txt").expect("Error reading input");
         let file_path_component = "changes";
         let file_path = Path::new("tests/data/simple").join(file_path_component);
@@ -80,7 +105,7 @@ mod cli {
     }
 
     #[test]
-    fn test_nested_move() -> Result<()> {
+    fn nested_move() -> Result<()> {
         let input = fs::read_to_string("tests/data/nested/find.txt").expect("Error reading input");
         let file_path_component = "change dir with spaces/change dir with spaces two/change file with spaces";
         let file_path = Path::new("tests/data/nested").join(file_path_component);
