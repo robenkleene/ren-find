@@ -28,8 +28,8 @@ impl Writer {
         let mut modified_paths: Vec<String> = Vec::new();
         let mut print_diff = false;
         for path in &self.paths {
-            let dst = self.src_to_dst[path];
-            if *path == dst || (*path != dst && !Self::check(&path.to_path_buf(), &dst)) {
+            let dst = &self.src_to_dst[path];
+            if path == dst || (path != dst && !Self::check(&path.to_path_buf(), &dst)) {
                 let path_string = path.to_string_lossy();
                 modified_paths.push(path_string.to_string());
                 continue;
@@ -58,8 +58,8 @@ impl Writer {
 
     pub(crate) fn write_file(&self) -> Result<()> {
         for path in &self.paths {
-            let dst = self.src_to_dst[path];
-            if *path == dst || !Self::check(&path.to_path_buf(), &dst) {
+            let dst = &self.src_to_dst[path];
+            if path == dst || !Self::check(&path.to_path_buf(), &dst) {
                 continue;
             }
             if let Err(err) = fs::rename(path, &dst) {
