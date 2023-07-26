@@ -1,1 +1,2 @@
 change dir with spaces/change dir with spaces two/change file with spaces
+change dir with spaces/
