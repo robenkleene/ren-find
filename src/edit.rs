@@ -44,3 +44,29 @@ impl<'a> Edit<'a> {
         Ok(PathBuf::from(dst_path))
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    fn parse<'a>(
+        look_for: impl Into<String>,
+        replace_with: impl Into<String>,
+        paths: &Vec<PathBuf>,
+        str_to_dst: IndexMap<PathBuf, PathBuf>,
+    ) {
+        let replacer = Replacer::new(
+            look_for,
+            replace_with,
+            false,
+            None,
+            None,
+        )
+        let edit = Edit::new(replacer);
+        let result = edit.parse(paths)
+        // assert_eq!(
+        //     std::str::from_utf8(&replacer.replace(src.as_bytes())),
+        //     Ok(target)
+        // );
+    }
+}
