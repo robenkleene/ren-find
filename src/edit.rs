@@ -63,10 +63,21 @@ mod tests {
             None,
         ).unwrap();
         let edit = Edit::new(&replacer);
-        let result = edit.parse(paths);
-        // assert_eq!(
-        //     std::str::from_utf8(&replacer.replace(src.as_bytes())),
-        //     Ok(target)
-        // );
+        let parsed = edit.parse(paths).unwrap();
+        assert_eq!(
+            parsed,
+            str_to_dst
+        );
+    }
+
+
+    #[test]
+    fn dirs_replace() {
+        let expected = IndexMap::from([
+            ("changes/", "altered/"),
+            ("changes/stays", "altered/stays"),
+            ("stays/", "stays/"),
+        ]);
+        replace("changes", "altered", false, None, ["changes/", "changes/stays", "stays/"], expected);
     }
 }
