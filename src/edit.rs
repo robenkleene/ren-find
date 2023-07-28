@@ -56,14 +56,14 @@ mod tests {
         str_to_dst: IndexMap<PathBuf, PathBuf>,
     ) {
         let replacer = Replacer::new(
-            look_for,
-            replace_with,
+            look_for.into(),
+            replace_with.into(),
             false,
             None,
             None,
-        )
-        let edit = Edit::new(replacer);
-        let result = edit.parse(paths)
+        ).unwrap();
+        let edit = Edit::new(&replacer);
+        let result = edit.parse(paths);
         // assert_eq!(
         //     std::str::from_utf8(&replacer.replace(src.as_bytes())),
         //     Ok(target)
