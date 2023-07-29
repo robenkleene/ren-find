@@ -27,22 +27,21 @@ impl App {
                 Err(_) => return Ok(()), // FIXME:
             };
 
-            let mut paths = Vec::new();
+            let mut sorted_paths = Vec::new();
             for line in handle.lines() {
                 // Trim any trailing slashes by getting the `file_name()` and then adding it back
                 let path = PathBuf::from(line?);
                 let filename = path.file_name().unwrap();
                 let filename_dir = path.parent().unwrap();
                 let key = filename_dir.join(filename);
-                paths.push(key);
+                sorted_paths.push(key);
             }
-            let mut sorted_paths = paths.clone();
             sorted_paths.sort_by(|a, b| b.to_str().unwrap().len().cmp(&a.to_str().unwrap().len()));
             let edit = Edit::new(&self.replacer);
             match edit.parse(&sorted_paths) {
                 Ok(src_to_dst) => {
                     if preview {
-                        let writer = Writer::new(paths, src_to_dst);
+                        let writer = Writer::new(sorted_paths, src_to_dst);
                         let text = match writer.patch_preview(color) {
                             Ok(text) => text,
                             Err(_) => return Ok(()), // FIXME:
