@@ -34,6 +34,7 @@ impl<'a> Edit<'a> {
     }
 
     fn replace_path(&self, path: &PathBuf) -> Result<PathBuf, Utf8Error> {
+        // `path.file_name()` removes any trailing slash
         let filename = path.file_name().unwrap();
         let filename_string = filename.to_string_lossy();
         let filename_bytes = filename_string.as_bytes();
@@ -70,14 +71,40 @@ mod tests {
         );
     }
 
+    fn replace_path<'a>(
+        look_for: impl Into<String>,
+        replace_with: impl Into<String>,
+        src: &PathBuf,
+        dst: &PathBuf,
+    ) {
+        let replacer = Replacer::new(
+            look_for.into(),
+            replace_with.into(),
+            false,
+            None,
+            None,
+        ).unwrap();
+        let edit = Edit::new(&replacer);
+        let replaced = edit.replace_path(src).unwrap();
+        assert_eq!(
+            &replaced,
+            dst
+        );
+    }
 
     #[test]
     fn dirs_replace() {
         let expected = IndexMap::from([
-            ("changes/", "altered/"),
-            ("changes/stays", "altered/stays"),
-            ("stays/", "stays/"),
+            (PathBuf::from("changes/"), PathBuf::from("altered/")),
+            (PathBuf::from("changes/stays"), PathBuf::from("altered/stays")),
+            (PathBuf::from("stays/"), PathBuf::from("stays/")),
         ]);
-        replace("changes", "altered", false, None, ["changes/", "changes/stays", "stays/"], expected);
+        let paths: Vec<PathBuf> = ["changes/", "changes/stays", "stays/"].iter().map(|a| PathBuf::from(a)).collect();
+        parse("changes", "altered", &paths, expected);
+    }
+
+    #[test]
+    fn replace_path_slashes() {
+        replace_path("changes", "altered", &PathBuf::from("stays/"), &PathBuf::from("stays"))
     }
 }

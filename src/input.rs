@@ -27,7 +27,6 @@ impl App {
                 Err(_) => return Ok(()), // FIXME:
             };
 
-
             let mut paths = Vec::new();
             for line in handle.lines() {
                 let path = PathBuf::from(line?);
