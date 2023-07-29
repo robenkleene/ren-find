@@ -95,11 +95,13 @@ mod tests {
     #[test]
     fn dirs_replace() {
         let expected = IndexMap::from([
-            (PathBuf::from("changes/"), PathBuf::from("altered/")),
-            (PathBuf::from("changes/stays"), PathBuf::from("altered/stays")),
-            (PathBuf::from("stays/"), PathBuf::from("stays/")),
+            (PathBuf::from("changes"), PathBuf::from("altered")),
+            (PathBuf::from("changes/stays"), PathBuf::from("changes/stays")),
+            (PathBuf::from("stays"), PathBuf::from("stays")),
         ]);
-        let paths: Vec<PathBuf> = ["changes/", "changes/stays", "stays/"].iter().map(|a| PathBuf::from(a)).collect();
+        let mut paths: Vec<PathBuf> = ["changes", "changes/stays", "stays"].iter().map(|a| PathBuf::from(a)).collect();
+        // Input needs to be sorted
+        paths.sort_by(|a, b| b.to_str().unwrap().len().cmp(&a.to_str().unwrap().len()));
         parse("changes", "altered", &paths, expected);
     }
 
