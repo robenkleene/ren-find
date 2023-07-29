@@ -4,7 +4,8 @@ set -euo pipefail
 
 cd "$(dirname "$0")" || exit 1
 
-diff --unified <(awk '{ print length, $0 }' < find.txt | sort -n -s | cut -d" " -f2-) <(sed s/changes/altered/g find.txt) > patch.patch || true
+sorted=$(awk '{ print length, $0 }' < find.txt | sort -n -s | cut -d" " -f2-)
+diff --unified <(echo "$sorted") <(echo "$sorted" | sed s/changes/altered/g) > patch.patch || true
 sed -i.bak '1s/.*/--- original/' patch.patch
 sed -i.bak '2s/.*/+++ modified/' patch.patch
 
