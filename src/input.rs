@@ -29,8 +29,12 @@ impl App {
 
             let mut paths = Vec::new();
             for line in handle.lines() {
+                // Trim any trailing slashes by getting the `file_name()` and then adding it back
                 let path = PathBuf::from(line?);
-                paths.push(path);
+                let filename = path.file_name().unwrap();
+                let filename_dir = path.parent().unwrap();
+                let key = filename_dir.join(filename);
+                paths.push(key);
             }
             let mut sorted_paths = paths.clone();
             sorted_paths.sort_by(|a, b| b.to_str().unwrap().len().cmp(&a.to_str().unwrap().len()));
