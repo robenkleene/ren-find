@@ -2,6 +2,8 @@
 
 set -euo pipefail
 
+cd "$(dirname "$0")" || exit 1
+
 sorted=$(awk '{ print length, $0 }' < find.txt | sort -nsr | cut -d" " -f2-)
 diff --unified <(echo "$sorted") <(echo "$sorted" | sed 's/\(.*\)changes/\1altered/') > patch.patch || true
 
