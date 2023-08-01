@@ -3,9 +3,10 @@
 @@ -1,5 +1,5 @@
 -changes stays changes
 -stays changes
-+changes stays altered
+-changes stays
++altered stays altered
 +stays altered
- changes stays
++altered stays
  stays stays
  stays
 \ No newline at end of file
