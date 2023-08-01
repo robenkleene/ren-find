@@ -13,7 +13,7 @@ mod cli {
 
     #[test]
     fn multiple_preview() -> Result<()> {
-        let input = fs::read_to_string("tests/data/multiple/start.txt").expect("Error reading input");
+        let input = fs::read_to_string("tests/data/multiple/find.txt").expect("Error reading input");
         let result = fs::read_to_string("tests/data/multiple/patch.patch").expect("Error reading input");
         mov()
             .current_dir("tests/data/multiple")
@@ -27,7 +27,7 @@ mod cli {
 
     #[test]
     fn missing_preview() -> Result<()> {
-        let input = fs::read_to_string("tests/data/missing/start.txt").expect("Error reading input");
+        let input = fs::read_to_string("tests/data/missing/find.txt").expect("Error reading input");
         mov()
             .current_dir("tests/data/missing")
             .write_stdin(input)
