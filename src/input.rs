@@ -31,8 +31,14 @@ impl App {
             for line in handle.lines() {
                 // Trim any trailing slashes by getting the `file_name()` and then adding it back
                 let path = PathBuf::from(line?);
-                let filename = path.file_name().unwrap();
-                let filename_dir = path.parent().unwrap();
+                let filename = match path.file_name() {
+                  Some(filename) => filename,
+                  None => continue
+                };
+                let filename_dir = match path.parent() {
+                  Some(filename_dir) => filename_dir,
+                  None => continue
+                };
                 let key = filename_dir.join(filename);
                 sorted_paths.push(key);
             }
