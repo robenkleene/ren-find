@@ -107,7 +107,7 @@ mod cli {
     #[test]
     fn nested_move() -> Result<()> {
         let input = fs::read_to_string("tests/data/nested/find.txt").expect("Error reading input");
-        let file_path_component = "change dir with spaces/change dir with spaces two/change file with spaces";
+        let file_path_component = "changes dir with spaces/stays dir with spaces two/changes file with spaces";
         let file_path = Path::new("tests/data/nested").join(file_path_component);
         let tmp_dir = tempfile::tempdir()?;
         let tmp_dir_path = tmp_dir.path();
