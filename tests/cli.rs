@@ -120,7 +120,7 @@ mod cli {
         let command = mov()
             .current_dir(tmp_dir_path)
             .write_stdin(input)
-            .args(&["change", "altered", "-w"])
+            .args(&["changes", "altered", "-w"])
             .assert()
             .success();
         let output = command.get_output();
@@ -129,6 +129,7 @@ mod cli {
         assert!(!Path::exists(&file_path_dst));
         let file_path_component_moved = "altered dir with spaces/stays dir with spaces two/altered file with spaces";
         let file_path_moved = tmp_dir_path.join(file_path_component_moved);
+        println!("file_path_moved = {:?}", file_path_moved);
         assert!(Path::exists(&file_path_moved));
         Ok(())
     }
