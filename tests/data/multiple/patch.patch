@@ -1,0 +1,12 @@
+--- original
++++ modified
+@@ -1,5 +1,5 @@
+-changes stays changes
+-stays changes
+-changes stays
++altered stays altered
++stays altered
++altered stays
+ stays stays
+ stays
+\ No newline at end of file
