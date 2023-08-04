@@ -1,5 +1,5 @@
 [package]
-name = "mov-find"
+name = "ren-find"
 version = "0.0.1"
 edition = "2018"
 authors = ["Roben Kleene <contact@robenkleene.com>"]
@@ -7,12 +7,12 @@ description = "Rename files from find results."
 readme = "README.md"
 keywords = ["rename", "find", "replace", "regex", "grep"]
 license = "MIT"
-homepage = "https://github.com/robenkleene/mov-find"
-repository = "https://github.com/robenkleene/mov-find.git"
+homepage = "https://github.com/robenkleene/ren-find"
+repository = "https://github.com/robenkleene/ren-find.git"
 categories = ["command-line-utilities", "development-tools"]
 
 [[bin]]
-name = "mov"
+name = "ren"
 path = "src/main.rs"
 
 [dependencies]
