@@ -1,4 +1,4 @@
-use diffy_fork_filenames::{create_patch, PatchFormatter};
+use diffy_fork_filenames::{create_patch, PatchFormatter, Patch};
 use indexmap::IndexMap;
 use std::{fs, path::PathBuf};
 
@@ -27,20 +27,7 @@ impl Writer {
     pub(crate) fn patch_preview(&self, color: bool, delete: bool) -> Result<String, crate::writer::Error> {
         let mut modified_paths: Vec<String> = Vec::new();
         let mut print_diff = false;
-        for path in &self.paths {
-            let dst = &self.src_to_dst[path];
-            if path == dst || (path != dst && !Self::check(&path.to_path_buf(), &dst)) {
-                let path_string = path.to_string_lossy();
-                modified_paths.push(path_string.to_string());
-                continue;
-            }
-            print_diff = true;
-            modified_paths.push(dst.to_string_lossy().to_string());
-        }
-        if !print_diff {
-            return Ok("".to_string());
-        }
-        let modified = modified_paths.join("\n");
+        let mut modified = "";
         let original: String = self
             .paths
             .clone()
@@ -48,6 +35,22 @@ impl Writer {
             .map(|p| p.to_string_lossy().to_string())
             .collect::<Vec<String>>()
             .join("\n");
+        if !delete {
+            for path in &self.paths {
+                let dst = &self.src_to_dst[path];
+                if path == dst || (path != dst && !Self::check(&path.to_path_buf(), &dst)) {
+                    let path_string = path.to_string_lossy();
+                    modified_paths.push(path_string.to_string());
+                    continue;
+                }
+                print_diff = true;
+                modified_paths.push(dst.to_string_lossy().to_string());
+            }
+            if !print_diff {
+                return Ok("".to_string());
+            }
+            modified = modified_paths.join("\n");
+        }
         let patch = create_patch(&original, &modified);
         let f = match color {
             true => PatchFormatter::new().with_color(),
