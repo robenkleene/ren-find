@@ -132,6 +132,20 @@ mod cli {
     }
 
     #[test]
+    fn simple_delete_preview() -> Result<()> {
+        let input = fs::read_to_string("tests/data/simple/find.txt").expect("Error reading input");
+        let result = fs::read_to_string("tests/data/simple/patch.patch").expect("Error reading input");
+        ren()
+            .current_dir("tests/data/simple")
+            .write_stdin(input)
+            .args(&["changes", "altered"])
+            .assert()
+            .success()
+            .stdout(result);
+        Ok(())
+    }
+
+    #[test]
     fn nested_delete_preview() -> Result<()> {
         let input = fs::read_to_string("tests/data/nested/find.txt").expect("Error reading input");
         let result = fs::read_to_string("tests/data/nested/patch.patch").expect("Error reading input");
@@ -146,16 +160,26 @@ mod cli {
     }
 
     #[test]
-    fn simple_delete_preview() -> Result<()> {
+    fn simple_delete() -> Result<()> {
         let input = fs::read_to_string("tests/data/simple/find.txt").expect("Error reading input");
-        let result = fs::read_to_string("tests/data/simple/patch.patch").expect("Error reading input");
+        let file_path_component = "changes";
+        let file_path = Path::new("tests/data/simple").join(file_path_component);
+        let tmp_dir = tempfile::tempdir()?;
+        let tmp_dir_path = tmp_dir.path();
+        let file_path_dst = tmp_dir_path.join(file_path_component);
+        let prefix = file_path_dst.parent().unwrap();
+        std::fs::create_dir_all(prefix).unwrap();
+        fs::copy(file_path, &file_path_dst).expect("Error copying file");
         ren()
-            .current_dir("tests/data/simple")
+            .current_dir(tmp_dir_path)
             .write_stdin(input)
-            .args(&["changes", "altered"])
+            .args(&["changes", "altered", "-w"])
             .assert()
-            .success()
-            .stdout(result);
+            .success();
+        assert!(!Path::exists(&file_path_dst));
+        let file_path_component_moved = "altered";
+        let file_path_moved = tmp_dir_path.join(file_path_component_moved);
+        assert!(Path::exists(&file_path_moved));
         Ok(())
     }
 
@@ -185,29 +209,4 @@ mod cli {
         assert!(Path::exists(&file_path_moved));
         Ok(())
     }
-
-    #[test]
-    fn simple_delete() -> Result<()> {
-        let input = fs::read_to_string("tests/data/simple/find.txt").expect("Error reading input");
-        let file_path_component = "changes";
-        let file_path = Path::new("tests/data/simple").join(file_path_component);
-        let tmp_dir = tempfile::tempdir()?;
-        let tmp_dir_path = tmp_dir.path();
-        let file_path_dst = tmp_dir_path.join(file_path_component);
-        let prefix = file_path_dst.parent().unwrap();
-        std::fs::create_dir_all(prefix).unwrap();
-        fs::copy(file_path, &file_path_dst).expect("Error copying file");
-        ren()
-            .current_dir(tmp_dir_path)
-            .write_stdin(input)
-            .args(&["changes", "altered", "-w"])
-            .assert()
-            .success();
-        assert!(!Path::exists(&file_path_dst));
-        let file_path_component_moved = "altered";
-        let file_path_moved = tmp_dir_path.join(file_path_component_moved);
-        assert!(Path::exists(&file_path_moved));
-        Ok(())
-    }
-
 }
