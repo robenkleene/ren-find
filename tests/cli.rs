@@ -134,11 +134,11 @@ mod cli {
     #[test]
     fn simple_delete_preview() -> Result<()> {
         let input = fs::read_to_string("tests/data/simple/find.txt").expect("Error reading input");
-        let result = fs::read_to_string("tests/data/simple/patch.patch").expect("Error reading input");
+        let result = fs::read_to_string("tests/data/simple/delete.patch").expect("Error reading input");
         ren()
             .current_dir("tests/data/simple")
             .write_stdin(input)
-            .args(&["changes", "altered"])
+            .args(&["-d"])
             .assert()
             .success()
             .stdout(result);
