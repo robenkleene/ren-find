@@ -35,7 +35,7 @@ fn main() -> Result<()> {
         false
     };
 
-    let pager = env::var("MOV_PAGER").ok();
+    let pager = env::var("REN_PAGER").ok();
 
     if let (Some(find), Some(replace_with)) = (options.find, options.replace_with) {
         App::new(Replacer::new(
