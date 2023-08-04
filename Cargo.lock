@@ -377,7 +377,7 @@ dependencies = [
 ]
 
 [[package]]
-name = "mov-find"
+name = "ren-find"
 version = "0.0.1"
 dependencies = [
  "ansi_term",
