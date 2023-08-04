@@ -1,4 +1,4 @@
-use diffy_fork_filenames::{create_patch, PatchFormatter, Patch};
+use diffy_fork_filenames::{create_patch, PatchFormatter};
 use indexmap::IndexMap;
 use std::{fs, path::PathBuf};
 
