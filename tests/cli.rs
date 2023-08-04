@@ -124,12 +124,9 @@ mod cli {
             .assert()
             .success();
         let output = command.get_output();
-        println!("stdout = {:?}", String::from_utf8_lossy(&output.stdout));
-        println!("stderr = {:?}", String::from_utf8_lossy(&output.stderr));
         assert!(!Path::exists(&file_path_dst));
         let file_path_component_moved = "altered dir with spaces/stays dir with spaces two/altered file with spaces";
         let file_path_moved = tmp_dir_path.join(file_path_component_moved);
-        println!("file_path_moved = {:?}", file_path_moved);
         assert!(Path::exists(&file_path_moved));
         Ok(())
     }
