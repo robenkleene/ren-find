@@ -24,7 +24,7 @@ impl Writer {
         Self { paths, src_to_dst }
     }
 
-    pub(crate) fn patch_preview(&self, color: bool) -> Result<String, crate::writer::Error> {
+    pub(crate) fn patch_preview(&self, color: bool, delete: bool) -> Result<String, crate::writer::Error> {
         let mut modified_paths: Vec<String> = Vec::new();
         let mut print_diff = false;
         for path in &self.paths {
@@ -56,19 +56,29 @@ impl Writer {
         return Ok(f.fmt_patch(&patch).to_string());
     }
 
-    pub(crate) fn write_file(&self) -> Result<()> {
+    pub(crate) fn write_file(&self, delete: bool) -> Result<()> {
         for path in &self.paths {
             let dst = &self.src_to_dst[path];
             if path == dst || !Self::check(&path.to_path_buf(), &dst) {
                 continue;
             }
-            if let Err(err) = fs::rename(path, &dst) {
-                eprintln!(
-                    "Error: failed to move '{}' to '{}', underlying error: {}",
-                    path.display(),
-                    &dst.display(),
-                    err
-                );
+            if delete {
+                if let Err(err) = fs::remove_file(path) {
+                    eprintln!(
+                        "Error: failed to remove file '{}': {}",
+                        path.display(),
+                        err
+                    );
+                }
+            } else {
+                if let Err(err) = fs::rename(path, &dst) {
+                    eprintln!(
+                        "Error: failed to move '{}' to '{}', underlying error: {}",
+                        path.display(),
+                        &dst.display(),
+                        err
+                    );
+                }
             }
         }
         Ok(())
