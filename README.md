@@ -1,5 +1,3 @@
-# Mov
+# Ren
 
-# Mov
-
-wgrep/write-grep CLI
+Rename utility that takes `find` output as input.
