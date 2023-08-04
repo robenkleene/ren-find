@@ -27,7 +27,7 @@ impl Writer {
     pub(crate) fn patch_preview(&self, color: bool, delete: bool) -> Result<String, crate::writer::Error> {
         let mut modified_paths: Vec<String> = Vec::new();
         let mut print_diff = false;
-        let mut modified = "";
+        let mut modified = "".to_string();
         let original: String = self
             .paths
             .clone()
@@ -49,7 +49,7 @@ impl Writer {
             if !print_diff {
                 return Ok("".to_string());
             }
-            modified = modified_paths.join("\n");
+            modified = modified_paths.join("\n").to_string();
         }
         let patch = create_patch(&original, &modified);
         let f = match color {
