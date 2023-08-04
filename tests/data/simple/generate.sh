@@ -18,5 +18,13 @@ line_fix='$a\
 \\ No newline at end of file
 '
 sed -i.bak "${line_fix}" patch.patch
-
 rm patch.patch.bak
+
+# Delete
+
+diff --unified find.txt <(echo "") > delete.patch || true
+
+sed -i.bak '1s/.*/--- original/' delete.patch
+sed -i.bak '2s/.*/+++ modified/' delete.patch
+
+rm delete.patch.bak
