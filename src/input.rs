@@ -49,7 +49,7 @@ impl App {
               Some(replacer) => {
                 let edit = Edit::new(&replacer);
                 src_to_dst = match edit.parse(&sorted_paths) {
-                    Ok(src_to_dst) => src_to_dst,
+                    Ok(src_to_dst) => Some(src_to_dst),
                     Err(_) => return Ok(()), // FIXME:
                 };
               }
