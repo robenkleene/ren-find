@@ -36,8 +36,12 @@ impl Writer {
             .collect::<Vec<String>>()
             .join("\n");
         if !delete {
+            let src_to_dst = match &self.src_to_dst {
+              Some(src_to_dst) => src_to_dst,
+              None => panic!("Missing source to destination"),
+            };
             for path in &self.paths {
-                let dst = &self.src_to_dst[path];
+                let dst = src_to_dst[path];
                 if path == dst || (path != dst && !Self::check(&path.to_path_buf(), &dst)) {
                     let path_string = path.to_string_lossy();
                     modified_paths.push(path_string.to_string());
