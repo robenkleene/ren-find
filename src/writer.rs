@@ -65,10 +65,6 @@ impl Writer {
 
     pub(crate) fn write_file(&self, delete: bool) -> Result<()> {
         for path in &self.paths {
-            let dst = &self.src_to_dst[path];
-            if path == dst || !Self::check(&path.to_path_buf(), &dst) {
-                continue;
-            }
             if delete {
                 if let Err(err) = fs::remove_file(path) {
                     eprintln!(
@@ -78,6 +74,14 @@ impl Writer {
                     );
                 }
             } else {
+                let src_to_dst = match &self.src_to_dst {
+                  Some(src_to_dst) => src_to_dst,
+                  None => panic!("Missing source to destination"),
+                };
+                let dst = src_to_dst[path];
+                if path == &dst || !Self::check(&path.to_path_buf(), &dst) {
+                    continue;
+                }
                 if let Err(err) = fs::rename(path, &dst) {
                     eprintln!(
                         "Error: failed to move '{}' to '{}', underlying error: {}",
