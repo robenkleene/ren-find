@@ -45,7 +45,7 @@ impl App {
             }
             sorted_paths.sort_by(|a, b| b.to_str().unwrap().len().cmp(&a.to_str().unwrap().len()));
             let mut src_to_dst: Option<IndexMap<PathBuf, PathBuf>> = None;
-            match self.replacer {
+            match &self.replacer {
               Some(replacer) => {
                 let edit = Edit::new(&replacer);
                 src_to_dst = match edit.parse(&sorted_paths) {
