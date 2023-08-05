@@ -38,13 +38,15 @@ fn main() -> Result<()> {
     let pager = env::var("REN_PAGER").ok();
 
     if let (Some(find), Some(replace_with)) = (options.find, options.replace_with) {
-        App::new(Replacer::new(
-            find,
-            replace_with,
-            options.literal_mode,
-            options.flags,
-            options.replacements,
-        )?)
+        App::new(
+            Some(Replacer::new(
+                find,
+                replace_with,
+                options.literal_mode,
+                options.flags,
+                options.replacements,
+            )?)
+        )
         .run(!options.write, options.delete, color, pager)?;
     }
     process::exit(0);
