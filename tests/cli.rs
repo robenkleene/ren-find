@@ -173,13 +173,10 @@ mod cli {
         ren()
             .current_dir(tmp_dir_path)
             .write_stdin(input)
-            .args(&["changes", "altered", "-w"])
+            .args(&["-d", "-w"])
             .assert()
             .success();
         assert!(!Path::exists(&file_path_dst));
-        let file_path_component_moved = "altered";
-        let file_path_moved = tmp_dir_path.join(file_path_component_moved);
-        assert!(Path::exists(&file_path_moved));
         Ok(())
     }
 
