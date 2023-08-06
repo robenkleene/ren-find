@@ -114,16 +114,13 @@ mod cli {
         let file_path_dst = tmp_dir_path.join(file_path_component);
         let prefix = file_path_dst.parent().unwrap();
         std::fs::create_dir_all(prefix).unwrap();
-        assert!(Path::exists(&file_path));
         fs::copy(file_path, &file_path_dst).expect("Error copying file");
-        assert!(Path::exists(&file_path_dst));
-        let command = ren()
+        ren()
             .current_dir(tmp_dir_path)
             .write_stdin(input)
             .args(&["changes", "altered", "-w"])
             .assert()
             .success();
-        let output = command.get_output();
         assert!(!Path::exists(&file_path_dst));
         let file_path_component_moved = "altered dir with spaces/stays dir with spaces two/altered file with spaces";
         let file_path_moved = tmp_dir_path.join(file_path_component_moved);
@@ -190,20 +187,14 @@ mod cli {
         let file_path_dst = tmp_dir_path.join(file_path_component);
         let prefix = file_path_dst.parent().unwrap();
         std::fs::create_dir_all(prefix).unwrap();
-        assert!(Path::exists(&file_path));
         fs::copy(file_path, &file_path_dst).expect("Error copying file");
-        assert!(Path::exists(&file_path_dst));
-        let command = ren()
+        ren()
             .current_dir(tmp_dir_path)
             .write_stdin(input)
-            .args(&["changes", "altered", "-w"])
+            .args(&["-d", "-w"])
             .assert()
             .success();
-        let output = command.get_output();
         assert!(!Path::exists(&file_path_dst));
-        let file_path_component_moved = "altered dir with spaces/stays dir with spaces two/altered file with spaces";
-        let file_path_moved = tmp_dir_path.join(file_path_component_moved);
-        assert!(Path::exists(&file_path_moved));
         Ok(())
     }
 }
