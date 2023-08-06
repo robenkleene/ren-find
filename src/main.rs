@@ -48,6 +48,9 @@ fn main() -> Result<()> {
             )?)
         )
         .run(!options.write, options.delete, color, pager)?;
+    } else if options.delete {
+        App::new(None)
+        .run(!options.write, options.delete, color, pager)?;
     }
     process::exit(0);
 }
