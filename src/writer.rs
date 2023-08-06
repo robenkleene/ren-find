@@ -6,7 +6,7 @@ pub type Result<T, E = Error> = std::result::Result<T, E>;
 
 pub(crate) struct Writer {
     paths: Vec<PathBuf>,
-    src_to_dst: IndexMap<PathBuf, PathBuf>,
+    src_to_dst: Option<IndexMap<PathBuf, PathBuf>>,
 }
 
 #[derive(Debug, thiserror::Error)]
@@ -20,27 +20,14 @@ pub enum Error {
 }
 
 impl Writer {
-    pub(crate) fn new(paths: Vec<PathBuf>, src_to_dst: IndexMap<PathBuf, PathBuf>) -> Self {
+    pub(crate) fn new(paths: Vec<PathBuf>, src_to_dst: Option<IndexMap<PathBuf, PathBuf>>) -> Self {
         Self { paths, src_to_dst }
     }
 
-    pub(crate) fn patch_preview(&self, color: bool) -> Result<String, crate::writer::Error> {
+    pub(crate) fn patch_preview(&self, color: bool, delete: bool) -> Result<String, crate::writer::Error> {
         let mut modified_paths: Vec<String> = Vec::new();
         let mut print_diff = false;
-        for path in &self.paths {
-            let dst = &self.src_to_dst[path];
-            if path == dst || (path != dst && !Self::check(&path.to_path_buf(), &dst)) {
-                let path_string = path.to_string_lossy();
-                modified_paths.push(path_string.to_string());
-                continue;
-            }
-            print_diff = true;
-            modified_paths.push(dst.to_string_lossy().to_string());
-        }
-        if !print_diff {
-            return Ok("".to_string());
-        }
-        let modified = modified_paths.join("\n");
+        let mut modified = "".to_string();
         let original: String = self
             .paths
             .clone()
@@ -48,6 +35,26 @@ impl Writer {
             .map(|p| p.to_string_lossy().to_string())
             .collect::<Vec<String>>()
             .join("\n");
+        if !delete {
+            let src_to_dst = match &self.src_to_dst {
+              Some(src_to_dst) => src_to_dst,
+              None => panic!("Missing source to destination"),
+            };
+            for path in &self.paths {
+                let dst = &src_to_dst[path];
+                if path == dst || (path != dst && !Self::check(&path.to_path_buf(), &dst)) {
+                    let path_string = path.to_string_lossy();
+                    modified_paths.push(path_string.to_string());
+                    continue;
+                }
+                print_diff = true;
+                modified_paths.push(dst.to_string_lossy().to_string());
+            }
+            if !print_diff {
+                return Ok("".to_string());
+            }
+            modified = modified_paths.join("\n").to_string();
+        }
         let patch = create_patch(&original, &modified);
         let f = match color {
             true => PatchFormatter::new().with_color(),
@@ -56,19 +63,33 @@ impl Writer {
         return Ok(f.fmt_patch(&patch).to_string());
     }
 
-    pub(crate) fn write_file(&self) -> Result<()> {
+    pub(crate) fn write_file(&self, delete: bool) -> Result<()> {
         for path in &self.paths {
-            let dst = &self.src_to_dst[path];
-            if path == dst || !Self::check(&path.to_path_buf(), &dst) {
-                continue;
-            }
-            if let Err(err) = fs::rename(path, &dst) {
-                eprintln!(
-                    "Error: failed to move '{}' to '{}', underlying error: {}",
-                    path.display(),
-                    &dst.display(),
-                    err
-                );
+            if delete {
+                if let Err(err) = fs::remove_file(path) {
+                    eprintln!(
+                        "Error: failed to remove file '{}': {}",
+                        path.display(),
+                        err
+                    );
+                }
+            } else {
+                let src_to_dst = match &self.src_to_dst {
+                  Some(src_to_dst) => src_to_dst,
+                  None => panic!("Missing source to destination"),
+                };
+                let dst = &src_to_dst[path];
+                if path == dst || !Self::check(&path.to_path_buf(), &dst) {
+                    continue;
+                }
+                if let Err(err) = fs::rename(path, &dst) {
+                    eprintln!(
+                        "Error: failed to move '{}' to '{}', underlying error: {}",
+                        path.display(),
+                        &dst.display(),
+                        err
+                    );
+                }
             }
         }
         Ok(())

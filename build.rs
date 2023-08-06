@@ -27,6 +27,12 @@ fn create_man_page() {
         )
         .flag(
             Flag::new()
+                .short("-d")
+                .long("--delete")
+                .help("Delete files."),
+        )
+        .flag(
+            Flag::new()
                 .short("-s")
                 .long("--string-mode")
                 .help("Treat expressions as non-regex strings."),
