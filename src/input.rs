@@ -45,15 +45,12 @@ impl App {
             }
             sorted_paths.sort_by(|a, b| b.to_str().unwrap().len().cmp(&a.to_str().unwrap().len()));
             let mut src_to_dst: Option<IndexMap<PathBuf, PathBuf>> = None;
-            match &self.replacer {
-              Some(replacer) => {
+            if let Some(replacer) = &self.replacer {
                 let edit = Edit::new(&replacer);
                 src_to_dst = match edit.parse(&sorted_paths) {
                     Ok(src_to_dst) => Some(src_to_dst),
                     Err(_) => return Ok(()), // FIXME:
                 };
-              }
-              None => println!("No value")
             }
             if preview {
                 let writer = Writer::new(sorted_paths, src_to_dst);
