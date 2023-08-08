@@ -32,9 +32,7 @@ impl Writer {
             .paths
             .clone()
             .into_iter()
-            .map(|p| p.to_string_lossy().to_string())
-            .collect::<Vec<String>>()
-            .join("\n");
+            .fold(String::new(), |s, l| s + &l.to_string_lossy() + "\n");
         if !delete {
             let src_to_dst = match &self.src_to_dst {
               Some(src_to_dst) => src_to_dst,
@@ -53,7 +51,7 @@ impl Writer {
             if !print_diff {
                 return Ok("".to_string());
             }
-            modified = modified_paths.join("\n").to_string();
+            modified = modified_paths.into_iter().fold(String::new(), |s, l| s + &l + "\n");
         }
         let patch = create_patch(&original, &modified);
         let f = match color {
