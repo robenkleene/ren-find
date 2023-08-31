@@ -41,7 +41,11 @@ impl<'a> Edit<'a> {
         let filename_replaced = self.replacer.replace(filename_bytes);
         let filename_replaced_string = std::str::from_utf8(&filename_replaced)?;
         let filename_dir = path.parent().unwrap();
-        let dst_path = filename_dir.join(filename_replaced_string);
+        let mut dst_path = filename_dir.join(filename_replaced_string);
+        // Add back the slash if the input had it
+        if path.to_string_lossy().as_bytes().last() == Some(&b'/') {
+            dst_path.push("");
+        }
         Ok(PathBuf::from(dst_path))
     }
 }
