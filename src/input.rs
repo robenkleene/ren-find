@@ -40,7 +40,11 @@ impl App {
                   Some(filename_dir) => filename_dir,
                   None => continue
                 };
-                let key = filename_dir.join(filename);
+                let mut key = filename_dir.join(filename);
+                // Add back the slash if the input had it
+                if key.to_string_lossy().as_bytes().last() == Some(&b'/') {
+                    key.push("");
+                }
                 sorted_paths.push(key);
             }
             sorted_paths.sort_by(|a, b| b.to_str().unwrap().len().cmp(&a.to_str().unwrap().len()));
