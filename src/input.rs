@@ -42,7 +42,7 @@ impl App {
                 };
                 let mut key = filename_dir.join(filename);
                 // Add back the slash if the input had it
-                if key.to_string_lossy().as_bytes().last() == Some(&b'/') {
+                if path.to_string_lossy().as_bytes().last() == Some(&b'/') {
                     key.push("");
                 }
                 sorted_paths.push(key);
