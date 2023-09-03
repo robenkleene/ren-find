@@ -14,7 +14,7 @@ mod cli {
     #[test]
     fn multiple_preview() -> Result<()> {
         let input = fs::read_to_string("tests/data/multiple/find.txt").expect("Error reading input");
-        let result = fs::read_to_string("tests/data/multiple/patch.patch").expect("Error reading input");
+        let result = fs::read_to_string("tests/data/multiple/patch.patch").expect("Error reading result");
         ren()
             .current_dir("tests/data/multiple")
             .write_stdin(input)
@@ -41,7 +41,7 @@ mod cli {
     #[test]
     fn simple_preview() -> Result<()> {
         let input = fs::read_to_string("tests/data/simple/find.txt").expect("Error reading input");
-        let result = fs::read_to_string("tests/data/simple/patch.patch").expect("Error reading input");
+        let result = fs::read_to_string("tests/data/simple/patch.patch").expect("Error reading result");
         ren()
             .current_dir("tests/data/simple")
             .write_stdin(input)
@@ -55,7 +55,7 @@ mod cli {
     #[test]
     fn nested_preview() -> Result<()> {
         let input = fs::read_to_string("tests/data/nested/find.txt").expect("Error reading input");
-        let result = fs::read_to_string("tests/data/nested/patch.patch").expect("Error reading input");
+        let result = fs::read_to_string("tests/data/nested/patch.patch").expect("Error reading result");
         ren()
             .current_dir("tests/data/nested")
             .write_stdin(input)
@@ -69,7 +69,7 @@ mod cli {
     #[test]
     fn dirs_preview() -> Result<()> {
         let input = fs::read_to_string("tests/data/dirs/find.txt").expect("Error reading input");
-        let result = fs::read_to_string("tests/data/dirs/patch.patch").expect("Error reading input");
+        let result = fs::read_to_string("tests/data/dirs/patch.patch").expect("Error reading result");
         ren()
             .current_dir("tests/data/dirs")
             .write_stdin(input)
@@ -131,7 +131,7 @@ mod cli {
     #[test]
     fn simple_delete_preview() -> Result<()> {
         let input = fs::read_to_string("tests/data/simple/find.txt").expect("Error reading input");
-        let result = fs::read_to_string("tests/data/simple/delete.patch").expect("Error reading input");
+        let result = fs::read_to_string("tests/data/simple/delete.patch").expect("Error reading result");
         ren()
             .current_dir("tests/data/simple")
             .write_stdin(input)
@@ -145,7 +145,7 @@ mod cli {
     #[test]
     fn nested_delete_preview() -> Result<()> {
         let input = fs::read_to_string("tests/data/nested/find.txt").expect("Error reading input");
-        let result = fs::read_to_string("tests/data/nested/delete.patch").expect("Error reading input");
+        let result = fs::read_to_string("tests/data/nested/delete.patch").expect("Error reading result");
         ren()
             .current_dir("tests/data/nested")
             .write_stdin(input)
