@@ -69,7 +69,6 @@ impl App {
                     return Ok(()); // FIXME:
                 }
             }
-            drop(write);
         }
         Ok(())
     }
