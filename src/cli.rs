@@ -17,8 +17,12 @@ environment variable REN_PAGER can be used to override the pager.
     pub write: bool,
 
     #[structopt(short = "d", long = "delete")]
-    /// Delete files
+    /// Delete files and directories
     pub delete: bool,
+
+    #[structopt(short = "D", long = "delete-all")]
+    /// Delete files and directories, including directories that aren't empty
+    pub delete_all: bool,
 
     #[structopt(short = "s", long = "string-mode")]
     /// Treat expressions as non-regex strings
