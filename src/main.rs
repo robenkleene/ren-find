@@ -15,6 +15,12 @@ use replacer::Replacer;
 use std::env;
 use std::process;
 
+enum DeleteKind {
+    None,
+    Delete,
+    DeleteAll,
+}
+
 fn main() -> Result<()> {
     // Ignore ctrl-c (SIGINT) to avoid leaving an orphaned pager process.
     // See https://github.com/dandavison/delta/issues/681
