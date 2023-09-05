@@ -43,6 +43,16 @@ fn main() -> Result<()> {
 
     let pager = env::var("REN_PAGER").ok();
 
+    let delete_kind = || -> DeleteKind {
+        if options.delete_all {
+            return DeleteKind::DeleteAll;
+        } else if options.delete {
+            return DeleteKind::Delete;
+        } else {
+            return DeleteKind::None;
+        }
+    };
+
     if let (Some(find), Some(replace_with)) = (options.find, options.replace_with) {
         App::new(
             Some(Replacer::new(
