@@ -51,7 +51,7 @@ fn main() -> Result<()> {
         } else {
             return DeleteKind::None;
         }
-    };
+    }();
 
     if let (Some(find), Some(replace_with)) = (options.find, options.replace_with) {
         App::new(
@@ -63,10 +63,10 @@ fn main() -> Result<()> {
                 options.replacements,
             )?)
         )
-        .run(!options.write, options.delete, color, pager)?;
+        .run(!options.write, delete_kind, color, pager)?;
     } else if options.delete {
         App::new(None)
-        .run(!options.write, options.delete, color, pager)?;
+        .run(!options.write, delete_kind, color, pager)?;
     }
     process::exit(0);
 }
