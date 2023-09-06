@@ -1,3 +1,4 @@
+use crate::DeleteKind;
 use diffy_fork_filenames::{create_patch, PatchFormatter};
 use indexmap::IndexMap;
 use std::{fs, path::PathBuf};
@@ -24,7 +25,7 @@ impl Writer {
         Self { paths, src_to_dst }
     }
 
-    pub(crate) fn patch_preview(&self, color: bool, delete: bool) -> Result<String, crate::writer::Error> {
+    pub(crate) fn patch_preview(&self, color: bool, delete_kind: DeleteKind) -> Result<String, crate::writer::Error> {
         let mut modified_paths: Vec<String> = Vec::new();
         let mut print_diff = false;
         let mut modified = "".to_string();
@@ -33,7 +34,7 @@ impl Writer {
             .clone()
             .into_iter()
             .fold(String::new(), |s, l| s + &l.to_string_lossy() + "\n");
-        if !delete {
+        if let DeleteKind::None = delete_kind {
             let src_to_dst = match &self.src_to_dst {
               Some(src_to_dst) => src_to_dst,
               None => panic!("Missing source to destination"),

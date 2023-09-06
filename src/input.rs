@@ -58,7 +58,7 @@ impl App {
             }
             if preview {
                 let writer = Writer::new(sorted_paths, src_to_dst);
-                let text = match writer.patch_preview(color, delete) {
+                let text = match writer.patch_preview(color, delete_kind) {
                     Ok(text) => text,
                     Err(_) => return Ok(()), // FIXME:
                 };
