@@ -65,7 +65,7 @@ impl Writer {
     pub(crate) fn write_file(&self, delete_kind: DeleteKind) -> Result<()> {
         for path in &self.paths {
             match delete_kind {
-                Delete => {
+                DeleteKind::Delete => {
                     if path.is_dir() {
                         if let Err(err) = fs::remove_dir(path) {
                             eprintln!(
@@ -84,7 +84,7 @@ impl Writer {
                         }
                     }
                 }
-                DeleteAll => {
+                DeleteKind::DeleteAll => {
                     if path.is_dir() {
                         if let Err(err) = fs::remove_dir_all(path) {
                             eprintln!(

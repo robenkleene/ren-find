@@ -12,7 +12,7 @@ impl App {
         Self { replacer }
     }
 
-    pub(crate) fn run(&self, preview: bool, delete: DeleteKind, color: bool, pager: Option<String>) -> Result<()> {
+    pub(crate) fn run(&self, preview: bool, delete_kind: DeleteKind, color: bool, pager: Option<String>) -> Result<()> {
         {
             let stdin = std::io::stdin();
             let handle = stdin.lock();
@@ -65,7 +65,7 @@ impl App {
                 write!(write, "{}", text)?;
             } else {
                 let writer = Writer::new(sorted_paths, src_to_dst);
-                if let Err(_) = writer.write_file(delete) {
+                if let Err(_) = writer.write_file(delete_kind) {
                     return Ok(()); // FIXME:
                 }
             }
