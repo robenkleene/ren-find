@@ -15,8 +15,8 @@ use replacer::Replacer;
 use std::env;
 use std::process;
 
-enum DeleteKind {
-    None,
+enum EditKind {
+    Replace,
     Delete,
     DeleteAll,
 }
@@ -43,13 +43,13 @@ fn main() -> Result<()> {
 
     let pager = env::var("REN_PAGER").ok();
 
-    let delete_kind = || -> DeleteKind {
+    let delete_kind = || -> EditKind {
         if options.delete_all {
-            return DeleteKind::DeleteAll;
+            return EditKind::DeleteAll;
         } else if options.delete {
-            return DeleteKind::Delete;
+            return EditKind::Delete;
         } else {
-            return DeleteKind::None;
+            return EditKind::Replace;
         }
     }();
 

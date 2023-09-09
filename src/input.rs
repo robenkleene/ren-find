@@ -1,4 +1,4 @@
-use crate::{DeleteKind, edit::Edit, output::OutputType, writer::Writer, Replacer, Result};
+use crate::{EditKind, edit::Edit, output::OutputType, writer::Writer, Replacer, Result};
 use std::io::prelude::*;
 use std::path::PathBuf;
 use indexmap::IndexMap;
@@ -12,7 +12,7 @@ impl App {
         Self { replacer }
     }
 
-    pub(crate) fn run(&self, preview: bool, delete_kind: DeleteKind, color: bool, pager: Option<String>) -> Result<()> {
+    pub(crate) fn run(&self, preview: bool, delete_kind: EditKind, color: bool, pager: Option<String>) -> Result<()> {
         {
             let stdin = std::io::stdin();
             let handle = stdin.lock();
