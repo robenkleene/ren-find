@@ -15,6 +15,7 @@ use replacer::Replacer;
 use std::env;
 use std::process;
 
+#[derive(Debug)]
 enum EditKind {
     Replace,
     Delete,
@@ -64,7 +65,7 @@ fn main() -> Result<()> {
             )?)
         )
         .run(!options.write, delete_kind, color, pager)?;
-    } else if options.delete {
+    } else if options.delete || options.delete_all {
         App::new(None)
         .run(!options.write, delete_kind, color, pager)?;
     }
