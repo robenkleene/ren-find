@@ -15,6 +15,13 @@ use replacer::Replacer;
 use std::env;
 use std::process;
 
+#[derive(Debug)]
+enum EditKind {
+    Replace,
+    Delete,
+    DeleteAll,
+}
+
 fn main() -> Result<()> {
     // Ignore ctrl-c (SIGINT) to avoid leaving an orphaned pager process.
     // See https://github.com/dandavison/delta/issues/681
@@ -37,6 +44,16 @@ fn main() -> Result<()> {
 
     let pager = env::var("REN_PAGER").ok();
 
+    let delete_kind = || -> EditKind {
+        if options.delete_all {
+            return EditKind::DeleteAll;
+        } else if options.delete {
+            return EditKind::Delete;
+        } else {
+            return EditKind::Replace;
+        }
+    }();
+
     if let (Some(find), Some(replace_with)) = (options.find, options.replace_with) {
         App::new(
             Some(Replacer::new(
@@ -47,10 +64,10 @@ fn main() -> Result<()> {
                 options.replacements,
             )?)
         )
-        .run(!options.write, options.delete, color, pager)?;
-    } else if options.delete {
+        .run(!options.write, delete_kind, color, pager)?;
+    } else if options.delete || options.delete_all {
         App::new(None)
-        .run(!options.write, options.delete, color, pager)?;
+        .run(!options.write, delete_kind, color, pager)?;
     }
     process::exit(0);
 }

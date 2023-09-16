@@ -29,7 +29,13 @@ fn create_man_page() {
             Flag::new()
                 .short("-d")
                 .long("--delete")
-                .help("Delete files."),
+                .help("Delete files and directories."),
+        )
+        .flag(
+            Flag::new()
+                .short("-D")
+                .long("--delete-all")
+                .help("Delete files and directories, including directories that aren't empty."),
         )
         .flag(
             Flag::new()

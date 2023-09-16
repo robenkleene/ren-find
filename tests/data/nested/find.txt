@@ -1,2 +1,3 @@
 changes dir with spaces/stays dir with spaces two/changes file with spaces
-changes dir with spaces
+changes dir with spaces 2/
+changes dir with spaces/

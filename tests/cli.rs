@@ -14,7 +14,7 @@ mod cli {
     #[test]
     fn multiple_preview() -> Result<()> {
         let input = fs::read_to_string("tests/data/multiple/find.txt").expect("Error reading input");
-        let result = fs::read_to_string("tests/data/multiple/patch.patch").expect("Error reading input");
+        let result = fs::read_to_string("tests/data/multiple/patch.patch").expect("Error reading result");
         ren()
             .current_dir("tests/data/multiple")
             .write_stdin(input)
@@ -41,7 +41,7 @@ mod cli {
     #[test]
     fn simple_preview() -> Result<()> {
         let input = fs::read_to_string("tests/data/simple/find.txt").expect("Error reading input");
-        let result = fs::read_to_string("tests/data/simple/patch.patch").expect("Error reading input");
+        let result = fs::read_to_string("tests/data/simple/patch.patch").expect("Error reading result");
         ren()
             .current_dir("tests/data/simple")
             .write_stdin(input)
@@ -55,7 +55,7 @@ mod cli {
     #[test]
     fn nested_preview() -> Result<()> {
         let input = fs::read_to_string("tests/data/nested/find.txt").expect("Error reading input");
-        let result = fs::read_to_string("tests/data/nested/patch.patch").expect("Error reading input");
+        let result = fs::read_to_string("tests/data/nested/patch.patch").expect("Error reading result");
         ren()
             .current_dir("tests/data/nested")
             .write_stdin(input)
@@ -69,7 +69,7 @@ mod cli {
     #[test]
     fn dirs_preview() -> Result<()> {
         let input = fs::read_to_string("tests/data/dirs/find.txt").expect("Error reading input");
-        let result = fs::read_to_string("tests/data/dirs/patch.patch").expect("Error reading input");
+        let result = fs::read_to_string("tests/data/dirs/patch.patch").expect("Error reading result");
         ren()
             .current_dir("tests/data/dirs")
             .write_stdin(input)
@@ -131,7 +131,7 @@ mod cli {
     #[test]
     fn simple_delete_preview() -> Result<()> {
         let input = fs::read_to_string("tests/data/simple/find.txt").expect("Error reading input");
-        let result = fs::read_to_string("tests/data/simple/delete.patch").expect("Error reading input");
+        let result = fs::read_to_string("tests/data/simple/delete.patch").expect("Error reading result");
         ren()
             .current_dir("tests/data/simple")
             .write_stdin(input)
@@ -145,7 +145,7 @@ mod cli {
     #[test]
     fn nested_delete_preview() -> Result<()> {
         let input = fs::read_to_string("tests/data/nested/find.txt").expect("Error reading input");
-        let result = fs::read_to_string("tests/data/nested/delete.patch").expect("Error reading input");
+        let result = fs::read_to_string("tests/data/nested/delete.patch").expect("Error reading result");
         ren()
             .current_dir("tests/data/nested")
             .write_stdin(input)
@@ -180,21 +180,33 @@ mod cli {
     #[test]
     fn nested_delete() -> Result<()> {
         let input = fs::read_to_string("tests/data/nested/find.txt").expect("Error reading input");
-        let file_path_component = "changes dir with spaces/stays dir with spaces two/changes file with spaces";
-        let file_path = Path::new("tests/data/nested").join(file_path_component);
         let tmp_dir = tempfile::tempdir()?;
         let tmp_dir_path = tmp_dir.path();
+
+        // Path 1
+        let file_path_component = "changes dir with spaces/stays dir with spaces two/changes file with spaces";
+        let file_path = Path::new("tests/data/nested").join(file_path_component);
         let file_path_dst = tmp_dir_path.join(file_path_component);
         let prefix = file_path_dst.parent().unwrap();
         std::fs::create_dir_all(prefix).unwrap();
         fs::copy(file_path, &file_path_dst).expect("Error copying file");
+
+        // Path 2
+        let file_path_component2 = "changes dir with spaces 2/stays";
+        let file_path2 = Path::new("tests/data/nested").join(file_path_component2);
+        let file_path_dst2 = tmp_dir_path.join(file_path_component2);
+        let prefix2 = file_path_dst2.parent().unwrap();
+        std::fs::create_dir_all(prefix2).unwrap();
+        fs::copy(file_path2, &file_path_dst2).expect("Error copying file");
+
         ren()
             .current_dir(tmp_dir_path)
             .write_stdin(input)
-            .args(&["-d", "-w"])
+            .args(&["-D", "-w"])
             .assert()
             .success();
         assert!(!Path::exists(&file_path_dst));
+        assert!(!Path::exists(&file_path_dst2));
         Ok(())
     }
 }
