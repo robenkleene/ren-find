@@ -554,7 +554,7 @@ dependencies = [
 
 [[package]]
 name = "ren-find"
-version = "0.0.1"
+version = "0.0.2"
 dependencies = [
  "ansi_term",
  "anyhow",
