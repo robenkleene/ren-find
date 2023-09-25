@@ -29,15 +29,16 @@ impl Writer {
         let mut modified_paths: Vec<String> = Vec::new();
         let mut print_diff = false;
         let mut modified = "".to_string();
-        let original: String = self
+        let mut original: String = self
             .paths
             .clone()
             .into_iter()
             .fold(String::new(), |s, l| s + &l.to_string_lossy() + "\n");
+        original = original.strip_suffix("\n").unwrap_or(&original).to_string();
         if let EditKind::Replace = delete_kind {
             let src_to_dst = match &self.src_to_dst {
               Some(src_to_dst) => src_to_dst,
-              None => panic!("Missing source to destination"),
+              None => panic!("Missing source to destination"), // FIXME
             };
             for path in &self.paths {
                 let dst = &src_to_dst[path];
@@ -53,6 +54,7 @@ impl Writer {
                 return Ok("".to_string());
             }
             modified = modified_paths.into_iter().fold(String::new(), |s, l| s + &l + "\n");
+            modified = modified.strip_suffix("\n").unwrap_or(&modified).to_string();
         }
         let patch = create_patch(&original, &modified);
         let f = match color {
@@ -106,7 +108,7 @@ impl Writer {
                 EditKind::Replace => {
                     let src_to_dst = match &self.src_to_dst {
                       Some(src_to_dst) => src_to_dst,
-                      None => panic!("Missing source to destination"),
+                      None => panic!("Missing source to destination"), // FIXME
                     };
                     let dst = &src_to_dst[path];
                     if path == dst || !Self::check(&path.to_path_buf(), &dst) {
