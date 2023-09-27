@@ -9,9 +9,4 @@ diff --unified <(echo "$sorted") <(echo "$sorted" | sed 's/\(.*\)changes$/\1alte
 sed -i.bak '1s/.*/--- original/' patch.patch
 sed -i.bak '2s/.*/+++ modified/' patch.patch
 
-line_fix='$a\
-\\ No newline at end of file
-'
-sed -i.bak "${line_fix}" patch.patch
-
 rm patch.patch.bak
