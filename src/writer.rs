@@ -55,6 +55,10 @@ impl Writer {
             modified = modified_paths.into_iter().fold(String::new(), |s, l| s + &l + "\n");
         }
         let patch = create_patch(&original, &modified);
+        // The new line added at the end of diff output appears to come from the `PatchFormatter`,
+        // i.e., in the way it interprets the `Hunks` owned by the `Patch`
+        // You can't remove the line endings from `original` and `modified` because that will
+        // produce the `No new line at end of file` messages in the diffs
         let f = match color {
             true => PatchFormatter::new().with_color(),
             false => PatchFormatter::new(),
