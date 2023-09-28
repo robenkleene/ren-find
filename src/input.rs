@@ -69,6 +69,7 @@ impl App {
                     return Ok(()); // FIXME:
                 }
             }
+            drop(output_type);
         }
         Ok(())
     }

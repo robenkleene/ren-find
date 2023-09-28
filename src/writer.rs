@@ -37,7 +37,7 @@ impl Writer {
         if let EditKind::Replace = delete_kind {
             let src_to_dst = match &self.src_to_dst {
               Some(src_to_dst) => src_to_dst,
-              None => panic!("Missing source to destination"),
+              None => panic!("Missing source to destination"), // FIXME
             };
             for path in &self.paths {
                 let dst = &src_to_dst[path];
@@ -55,6 +55,10 @@ impl Writer {
             modified = modified_paths.into_iter().fold(String::new(), |s, l| s + &l + "\n");
         }
         let patch = create_patch(&original, &modified);
+        // The new line added at the end of diff output appears to come from the `PatchFormatter`,
+        // i.e., in the way it interprets the `Hunks` owned by the `Patch`
+        // You can't remove the line endings from `original` and `modified` because that will
+        // produce the `No new line at end of file` messages in the diffs
         let f = match color {
             true => PatchFormatter::new().with_color(),
             false => PatchFormatter::new(),
@@ -106,7 +110,7 @@ impl Writer {
                 EditKind::Replace => {
                     let src_to_dst = match &self.src_to_dst {
                       Some(src_to_dst) => src_to_dst,
-                      None => panic!("Missing source to destination"),
+                      None => panic!("Missing source to destination"), // FIXME
                     };
                     let dst = &src_to_dst[path];
                     if path == dst || !Self::check(&path.to_path_buf(), &dst) {
