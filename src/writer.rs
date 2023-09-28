@@ -29,12 +29,11 @@ impl Writer {
         let mut modified_paths: Vec<String> = Vec::new();
         let mut print_diff = false;
         let mut modified = "".to_string();
-        let mut original: String = self
+        let original: String = self
             .paths
             .clone()
             .into_iter()
             .fold(String::new(), |s, l| s + &l.to_string_lossy() + "\n");
-        original = original.strip_suffix("\n").unwrap_or(&original).to_string();
         if let EditKind::Replace = delete_kind {
             let src_to_dst = match &self.src_to_dst {
               Some(src_to_dst) => src_to_dst,
@@ -54,7 +53,6 @@ impl Writer {
                 return Ok("".to_string());
             }
             modified = modified_paths.into_iter().fold(String::new(), |s, l| s + &l + "\n");
-            modified = modified.strip_suffix("\n").unwrap_or(&modified).to_string();
         }
         let patch = create_patch(&original, &modified);
         let f = match color {
