@@ -200,7 +200,6 @@ mod cli {
         Ok(())
     }
 
-
     #[test]
     fn nested_delete() -> Result<()> {
         let input = fs::read_to_string("tests/data/nested/find.txt").expect("Error reading input");
