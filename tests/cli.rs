@@ -178,6 +178,30 @@ mod cli {
     }
 
     #[test]
+    fn simple_delete_missing() -> Result<()> {
+        let input = fs::read_to_string("tests/data/simple/missing.txt").expect("Error reading input");
+        let file_path_component = "changes";
+        let file_path = Path::new("tests/data/simple").join(file_path_component);
+        let tmp_dir = tempfile::tempdir()?;
+        let tmp_dir_path = tmp_dir.path();
+        let file_path_dst = tmp_dir_path.join(file_path_component);
+        let prefix = file_path_dst.parent().unwrap();
+        std::fs::create_dir_all(prefix).unwrap();
+        fs::copy(file_path, &file_path_dst).expect("Error copying file");
+        let command = ren()
+            .current_dir(tmp_dir_path)
+            .write_stdin(input)
+            .args(&["-d", "-w"])
+            .assert()
+            .success();
+        let output = command.get_output();
+        assert!(output.stderr.len() > 0);
+        assert!(!Path::exists(&file_path_dst));
+        Ok(())
+    }
+
+
+    #[test]
     fn nested_delete() -> Result<()> {
         let input = fs::read_to_string("tests/data/nested/find.txt").expect("Error reading input");
         let tmp_dir = tempfile::tempdir()?;
