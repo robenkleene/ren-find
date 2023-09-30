@@ -18,11 +18,4 @@ diff --unified find.txt <(printf "") > delete.patch || true
 sed -i.bak '1s/.*/--- original/' delete.patch
 sed -i.bak '2s/.*/+++ modified/' delete.patch
 
-# Missing
-
-diff --unified missing.txt <(printf "") > missing.patch || true
-
-sed -i.bak '1s/.*/--- original/' missing.patch
-sed -i.bak '2s/.*/+++ modified/' missing.patch
-
-rm missing.patch.bak
+rm delete.patch.bak
