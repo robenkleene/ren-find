@@ -23,11 +23,6 @@ enum EditKind {
 }
 
 fn main() -> Result<()> {
-    // Ignore ctrl-c (SIGINT) to avoid leaving an orphaned pager process.
-    // See https://github.com/dandavison/delta/issues/681
-    ctrlc::set_handler(|| {})
-        .unwrap_or_else(|err| eprintln!("Failed to set ctrl-c handler: {}", err));
-
     use structopt::StructOpt;
     let options = cli::Options::from_args();
 
