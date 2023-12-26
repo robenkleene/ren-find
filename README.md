@@ -18,6 +18,14 @@ Add the `-w` (`--write`) flag to rename the files:
 find . -name '*foo*' | ren foo bar
 ```
 
+## Installation
+
+`ren` is available via [`cargo`](https://github.com/rust-lang/cargo):
+
+```
+cargo install ren-find
+```
+
 ## Help
 
 `ren -h` (or `ren --help`) will list help for all the command-line flags.
