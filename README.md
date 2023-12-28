@@ -25,10 +25,13 @@ find . -name '*foo*' | ren foo bar
 ```
 cargo install ren-find
 ```
+## Configuration
+
+The default pager is `less`, the `REN_PAGER` environment variable can be used to override the pager (e.g., `export REN_PAGER=delta` in Bash).
 
 ## Help
 
-`ren -h` (or `ren --help`) will list help for all the command-line flags.
+`ren -h` (or `ren --help`, the full `--help` provides slightly longer explanations of some option) will list help for all the command-line flags.
 
 ## Acknowledgements
 
