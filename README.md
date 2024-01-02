@@ -1,6 +1,6 @@
 # Ren
 
-`ren` is a command-line utility that takes [`find`](https://en.wikipedia.org/wiki/Find_(Unix))-formatted lines via standard input, and batch renames theme. By default, it outputs a [`diff`](https://en.wikipedia.org/wiki/Diff)-preview of the renamed files and directories to standard output, and with a flag it can rename the files and directories.
+`ren` is a command-line utility that takes [`find`](https://en.wikipedia.org/wiki/Find_(Unix))-formatted lines via standard input, and batch renames them. By default, it outputs a [`diff`](https://en.wikipedia.org/wiki/Diff)-preview of the renamed files and directories to standard output, and with a flag it can rename the files and directories.
 
 [![Rename with `ren`](ren.gif)](https://youtu.be/d-UhiHyWnGQ)
 
