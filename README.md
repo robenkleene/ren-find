@@ -36,5 +36,5 @@ The default pager is `less`, the `REN_PAGER` environment variable can be used to
 ## Acknowledgements
 
 - Much of the functionality, and the overall structure of the source code, was borrowed [`sd`](https://github.com/chmln/sd). `ren` began as a fork of `sd`.
-- The code for specifying a custom pager for `ren` was borrowed from [delta`](https://github.com/dandavison/delta).
+- The code for specifying a custom pager for `ren` was borrowed from [`delta`](https://github.com/dandavison/delta).
 
