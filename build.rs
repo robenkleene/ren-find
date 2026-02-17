@@ -94,6 +94,10 @@ w - match full words only
                 .text("Find & replace from STDIN an emit to STDOUT")
                 .command(r#"ren 'window.fetch' 'fetch' < http.js"#)
         )
+        .custom(
+            Section::new("special characters")
+                .paragraph("Use -- to separate options from arguments when the pattern starts with a hyphen (e.g., ren -- '--foo' '--bar').")
+        )
         .render();
 
     let mut man_path =
