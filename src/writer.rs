@@ -18,6 +18,8 @@ pub enum Error {
     String(#[from] std::str::Utf8Error),
     #[error("failed to move file: {0}")]
     TempfilePersist(#[from] tempfile::PersistError),
+    #[error("missing source to destination mapping for replace operation")]
+    MissingMapping,
 }
 
 impl Writer {
@@ -37,7 +39,7 @@ impl Writer {
         if let EditKind::Replace = delete_kind {
             let src_to_dst = match &self.src_to_dst {
               Some(src_to_dst) => src_to_dst,
-              None => panic!("Missing source to destination"), // FIXME
+              None => return Err(Error::MissingMapping),
             };
             for path in &self.paths {
                 let dst = &src_to_dst[path];
@@ -110,7 +112,7 @@ impl Writer {
                 EditKind::Replace => {
                     let src_to_dst = match &self.src_to_dst {
                       Some(src_to_dst) => src_to_dst,
-                      None => panic!("Missing source to destination"), // FIXME
+                      None => return Err(Error::MissingMapping),
                     };
                     let dst = &src_to_dst[path];
                     if path == dst || !Self::check(&path.to_path_buf(), &dst) {

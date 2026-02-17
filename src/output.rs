@@ -130,12 +130,11 @@ impl OutputType {
 
     fn make_process_from_pager_path(pager_path: PathBuf, args: &[String]) -> Option<Command> {
         if pager_path.file_stem() == Some(&OsString::from("ren")) {
-            panic!(
-                "\
-    It looks like you have set ren as the value of $REN_PAGER. \
-    This would result in a non-terminating recursion. \
-    ren is not an appropriate value for $REN_PAGER.",
+            eprintln!(
+                "Error: ren cannot be used as its own pager ($REN_PAGER). \
+                 This would result in non-terminating recursion."
             );
+            return None;
         }
         if let Ok(pager_path) = grep_cli::resolve_binary(pager_path) {
             let mut p = Command::new(&pager_path);
