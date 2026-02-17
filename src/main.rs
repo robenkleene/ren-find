@@ -49,20 +49,31 @@ fn main() -> Result<()> {
         }
     }();
 
-    if let (Some(find), Some(replace_with)) = (options.find, options.replace_with) {
-        App::new(
-            Some(Replacer::new(
-                find,
-                replace_with,
-                options.literal_mode,
-                options.flags,
-                options.replacements,
-            )?)
-        )
-        .run(!options.write, delete_kind, color, pager)?;
-    } else if options.delete || options.delete_all {
-        App::new(None)
-        .run(!options.write, delete_kind, color, pager)?;
+    match (options.find, options.replace_with) {
+        (Some(find), Some(replace_with)) => {
+            App::new(
+                Some(Replacer::new(
+                    find,
+                    replace_with,
+                    options.literal_mode,
+                    options.flags,
+                    options.replacements,
+                )?)
+            )
+            .run(!options.write, delete_kind, color, pager)?;
+        }
+        (None, None) if options.delete || options.delete_all => {
+            App::new(None)
+            .run(!options.write, delete_kind, color, pager)?;
+        }
+        (Some(_), None) => {
+            eprintln!("Error: missing replacement argument. Usage: ren <find> <replace_with>");
+            std::process::exit(2);
+        }
+        _ => {
+            eprintln!("Error: missing arguments. Usage: ren <find> <replace_with> or ren -d/-D");
+            std::process::exit(2);
+        }
     }
     Ok(())
 }
