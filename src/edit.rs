@@ -22,14 +22,14 @@ impl<'a> Edit<'a> {
 
     pub(crate) fn parse(
         self,
-        paths: &Vec<PathBuf>,
+        paths: &[PathBuf],
     ) -> Result<IndexMap<PathBuf, PathBuf>, Error> {
         let mut src_to_dst = IndexMap::new();
         for path in paths {
-            let dst = self.replace_path(&path)?;
+            let dst = self.replace_path(path)?;
             src_to_dst.insert(path.clone(), dst);
         }
-        return Ok(src_to_dst);
+        Ok(src_to_dst)
     }
 
     fn replace_path(&self, path: &PathBuf) -> Result<PathBuf, Error> {
@@ -59,7 +59,7 @@ mod tests {
     fn parse<'a>(
         look_for: impl Into<String>,
         replace_with: impl Into<String>,
-        paths: &Vec<PathBuf>,
+        paths: &[PathBuf],
         str_to_dst: IndexMap<PathBuf, PathBuf>,
     ) {
         let replacer = Replacer::new(
