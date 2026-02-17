@@ -7,7 +7,6 @@ mod edit;
 // FIXME: Look at `pub(crate)` calls are all these necessary?
 mod less;
 pub(crate) mod replacer;
-pub(crate) mod utils;
 
 pub(crate) use self::input::App;
 pub(crate) use error::Result;
