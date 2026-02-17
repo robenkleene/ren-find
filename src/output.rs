@@ -132,9 +132,9 @@ impl OutputType {
         if pager_path.file_stem() == Some(&OsString::from("ren")) {
             panic!(
                 "\
-    It looks like you have set delta as the value of $PAGER. \
+    It looks like you have set ren as the value of $REN_PAGER. \
     This would result in a non-terminating recursion. \
-    delta is not an appropriate value for $PAGER.",
+    ren is not an appropriate value for $REN_PAGER.",
             );
         }
         if let Ok(pager_path) = grep_cli::resolve_binary(pager_path) {
