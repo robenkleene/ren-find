@@ -1,7 +1,7 @@
 use crate::replacer::Replacer;
 use std::str::Utf8Error;
 use indexmap::IndexMap;
-use std::path::PathBuf;
+use std::path::{Path, PathBuf};
 
 #[derive(Debug, thiserror::Error)]
 pub enum Error {
@@ -32,17 +32,17 @@ impl<'a> Edit<'a> {
         Ok(src_to_dst)
     }
 
-    fn replace_path(&self, path: &PathBuf) -> Result<PathBuf, Error> {
+    fn replace_path(&self, path: &Path) -> Result<PathBuf, Error> {
         // `path.file_name()` removes any trailing slash
         let filename = path.file_name()
-            .ok_or_else(|| Error::InvalidPath(path.clone()))?;
+            .ok_or_else(|| Error::InvalidPath(path.to_path_buf()))?;
         let filename_string = filename.to_string_lossy();
         let filename_bytes = filename_string.as_bytes();
         let filename_replaced = self.replacer.replace(filename_bytes);
         let filename_replaced_string = std::str::from_utf8(&filename_replaced)
             .map_err(|e| Error::ReplaceError(e))?;
         let filename_dir = path.parent()
-            .ok_or_else(|| Error::InvalidPath(path.clone()))?;
+            .ok_or_else(|| Error::InvalidPath(path.to_path_buf()))?;
         let mut dst_path = filename_dir.join(filename_replaced_string);
         // Add back the slash if the input had it
         if path.to_string_lossy().as_bytes().last() == Some(&b'/') {
@@ -80,8 +80,8 @@ mod tests {
     fn replace_path<'a>(
         look_for: impl Into<String>,
         replace_with: impl Into<String>,
-        src: &PathBuf,
-        dst: &PathBuf,
+        src: &Path,
+        dst: &Path,
     ) {
         let replacer = Replacer::new(
             look_for.into(),
