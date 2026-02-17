@@ -1,7 +1,7 @@
 use clap::Parser;
 
 #[derive(Debug, Parser)]
-#[command(next_line_help = true, after_help = "\
+#[command(version, next_line_help = true, after_help = "\
 SPECIAL CHARACTERS:
   Use -- to separate options from arguments when the pattern starts
   with a hyphen (e.g., ren -- '--foo' '--bar').")]
