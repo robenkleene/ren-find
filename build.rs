@@ -20,11 +20,12 @@ fn main() {
 fn create_man_page() {
     use man::prelude::*;
     let page = Manual::new("ren")
+        .about("Rename files from find results")
         .flag(
             Flag::new()
-                .short("-p")
-                .long("--preview")
-                .help("Emit the replacement to STDOUT"),
+                .short("-w")
+                .long("--write")
+                .help("Write the output to files directly (instead of outputting a patch)."),
         )
         .flag(
             Flag::new()
@@ -44,55 +45,56 @@ fn create_man_page() {
                 .long("--string-mode")
                 .help("Treat expressions as non-regex strings."),
         )
+        .flag(
+            Flag::new()
+                .short("-n")
+                .help("Limit the number of replacements per line."),
+        )
+        .flag(
+            Flag::new()
+                .long("--color")
+                .help("Enable color (the default if the output is a TTY)."),
+        )
+        .flag(
+            Flag::new()
+                .long("--no-color")
+                .help("Disable color."),
+        )
         .flag(Flag::new().short("-f").long("--flags").help(
-            r#"Treat expressions as non-regex strings.
-/** Regex flags. May be combined (like `-f mc`).
-
-c - case-sensitive
-i - case-insensitive
-m - multi-line matching
-w - match full words only
-"#,
+            "Regex flags. May be combined (like `-f mc`).\n\n\
+             c - case-sensitive\n\
+             e - disable multi-line matching\n\
+             i - case-insensitive\n\
+             m - multi-line matching\n\
+             s - make `.` match newlines\n\
+             w - match full words only",
         ))
         .arg(Arg::new("find"))
         .arg(Arg::new("replace_with"))
-        .arg(Arg::new("[FILES]"))
         .example(
             Example::new()
-                .text("String-literal mode")
-                .command(
-                    "echo 'lots((([]))) of special chars' | ren -s '((([])))' \
-                     ''",
-                )
-                .output("lots of special chars"),
+                .text("Preview renaming files containing 'foo' to 'bar'")
+                .command("find . -name '*foo*' | ren foo bar"),
         )
         .example(
             Example::new()
-                .text("Regex use. Let's trim some trailing whitespace")
-                .command("echo 'lorem ipsum 23   ' | ren '\\s+$' ''")
-                .output("lorem ipsum 23"),
+                .text("Rename the files")
+                .command("find . -name '*foo*' | ren -w foo bar"),
         )
         .example(
             Example::new()
-                .text("Indexed capture groups")
-                .command(r#"echo 'cargo +nightly watch' | ren '(\w+)\s+\+(\w+)\s+(\w+)' 'cmd: $1, channel: $2, subcmd: $3'"#)
-                .output("cmd: cargo, channel: nightly, subcmd: watch")
+                .text("Preview deleting files")
+                .command("find . -name '*.bak' | ren -d"),
         )
         .example(
             Example::new()
-                .text("Named capture groups")
-                .command(r#"echo "123.45" | ren '(?P<dollars>\d+)\.(?P<cents>\d+)' '$dollars dollars and $cents cents'"#)
-                .output("123 dollars and 45 cents")
+                .text("Use regex capture groups to rename files")
+                .command(r#"find . -name '*.jpeg' | ren '(.*)\.jpeg' '$1.jpg'"#),
         )
         .example(
             Example::new()
-                .text("Find & replace in file")
-                .command(r#"ren 'window.fetch' 'fetch' http.js"#)
-        )
-        .example(
-            Example::new()
-                .text("Find & replace from STDIN an emit to STDOUT")
-                .command(r#"ren 'window.fetch' 'fetch' < http.js"#)
+                .text("Use string-literal mode to rename files with special characters")
+                .command("find . -name '*[1]*' | ren -s '[1]' '(1)'"),
         )
         .custom(
             Section::new("special characters")

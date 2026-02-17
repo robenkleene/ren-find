@@ -16,20 +16,19 @@ name = "ren"
 path = "src/main.rs"
 
 [dependencies]
-regex = "1.4.3"
+regex = "1.12"
 clap = { version = "4", features = ["derive"] }
 unescape = "0.1.0"
-tempfile = "3.2.0"
-thiserror = "1.0.24"
+tempfile = "3.25"
+thiserror = "2"
 diffy-fork-filenames = "0.4.0"
-indexmap = "1.9.2"
-shell-words = "1.1.0"
-grep-cli = "0.1.7"
-ctrlc = "3.2.5"
+indexmap = "2"
+shell-words = "1.1"
+grep-cli = "0.1.12"
 
 [dev-dependencies]
-assert_cmd = "1.0.3"
-anyhow = "1.0.38"
+assert_cmd = "2"
+anyhow = "1"
 
 [build-dependencies]
 clap = { version = "4", features = ["derive"] }

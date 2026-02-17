@@ -69,13 +69,13 @@ impl Replacer {
     ) -> std::borrow::Cow<'a, [u8]> {
         if self.is_literal {
             self.regex.replacen(
-                &content,
+                content,
                 self.replacements,
                 regex::bytes::NoExpand(&self.replace_with),
             )
         } else {
             self.regex.replacen(
-                &content,
+                content,
                 self.replacements,
                 &*self.replace_with,
             )

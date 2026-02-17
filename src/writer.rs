@@ -46,7 +46,7 @@ impl Writer {
             };
             for path in &self.paths {
                 let dst = &src_to_dst[path];
-                if path == dst || (path != dst && !Self::check(path, dst)) {
+                if path == dst || !Self::check(path, dst) {
                     let path_string = path.to_string_lossy();
                     modified_paths.push(path_string.to_string());
                     continue;

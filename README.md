@@ -15,7 +15,7 @@ find . -name '*foo*' | ren foo bar
 Add the `-w` (`--write`) flag to rename the files:
 
 ```
-find . -name '*foo*' | ren foo bar
+find . -name '*foo*' | ren -w foo bar
 ```
 
 ## Installation
