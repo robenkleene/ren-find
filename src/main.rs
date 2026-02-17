@@ -13,6 +13,7 @@ pub(crate) use self::input::App;
 pub(crate) use error::Result;
 use replacer::Replacer;
 use std::env;
+use std::io::IsTerminal;
 use std::process;
 
 #[derive(Debug)]
@@ -26,7 +27,7 @@ fn main() -> Result<()> {
     use structopt::StructOpt;
     let options = cli::Options::from_args();
 
-    let is_tty = atty::is(atty::Stream::Stdout);
+    let is_tty = std::io::stdout().is_terminal();
     let color = if options.color {
         true
     } else if options.no_color {
