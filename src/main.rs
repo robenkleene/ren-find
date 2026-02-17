@@ -24,8 +24,8 @@ enum EditKind {
 }
 
 fn main() -> Result<()> {
-    use structopt::StructOpt;
-    let options = cli::Options::from_args();
+    use clap::Parser;
+    let options = cli::Options::parse();
 
     let is_tty = std::io::stdout().is_terminal();
     let color = if options.color {
