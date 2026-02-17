@@ -7,6 +7,8 @@ use std::path::PathBuf;
 pub enum Error {
     #[error("Replace failed")]
     ReplaceError(Utf8Error),
+    #[error("invalid path: {0}")]
+    InvalidPath(PathBuf),
 }
 
 pub(crate) struct Edit<'a> {
@@ -24,23 +26,23 @@ impl<'a> Edit<'a> {
     ) -> Result<IndexMap<PathBuf, PathBuf>, Error> {
         let mut src_to_dst = IndexMap::new();
         for path in paths {
-            let dst = match self.replace_path(&path) {
-              Ok(result) => result,
-              Err(err) => return Err(Error::ReplaceError(err)),
-            };
+            let dst = self.replace_path(&path)?;
             src_to_dst.insert(path.clone(), dst);
         }
         return Ok(src_to_dst);
     }
 
-    fn replace_path(&self, path: &PathBuf) -> Result<PathBuf, Utf8Error> {
+    fn replace_path(&self, path: &PathBuf) -> Result<PathBuf, Error> {
         // `path.file_name()` removes any trailing slash
-        let filename = path.file_name().unwrap();
+        let filename = path.file_name()
+            .ok_or_else(|| Error::InvalidPath(path.clone()))?;
         let filename_string = filename.to_string_lossy();
         let filename_bytes = filename_string.as_bytes();
         let filename_replaced = self.replacer.replace(filename_bytes);
-        let filename_replaced_string = std::str::from_utf8(&filename_replaced)?;
-        let filename_dir = path.parent().unwrap();
+        let filename_replaced_string = std::str::from_utf8(&filename_replaced)
+            .map_err(|e| Error::ReplaceError(e))?;
+        let filename_dir = path.parent()
+            .ok_or_else(|| Error::InvalidPath(path.clone()))?;
         let mut dst_path = filename_dir.join(filename_replaced_string);
         // Add back the slash if the input had it
         if path.to_string_lossy().as_bytes().last() == Some(&b'/') {
