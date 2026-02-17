@@ -4,7 +4,6 @@ mod input;
 mod output;
 mod writer;
 mod edit;
-// FIXME: Look at `pub(crate)` calls are all these necessary?
 mod less;
 pub(crate) mod replacer;
 
@@ -13,6 +12,7 @@ pub(crate) use error::Result;
 use replacer::Replacer;
 use std::env;
 use std::io::IsTerminal;
+
 
 #[derive(Debug)]
 enum EditKind {
@@ -25,28 +25,17 @@ fn main() -> Result<()> {
     use clap::Parser;
     let options = cli::Options::parse();
 
-    let is_tty = std::io::stdout().is_terminal();
-    let color = if options.color {
-        true
-    } else if options.no_color {
-        false
-    } else if is_tty {
-        true
-    } else {
-        false
-    };
+    let color = options.color || (!options.no_color && std::io::stdout().is_terminal());
 
     let pager = env::var("REN_PAGER").ok();
 
-    let delete_kind = || -> EditKind {
-        if options.delete_all {
-            return EditKind::DeleteAll;
-        } else if options.delete {
-            return EditKind::Delete;
-        } else {
-            return EditKind::Replace;
-        }
-    }();
+    let delete_kind = if options.delete_all {
+        EditKind::DeleteAll
+    } else if options.delete {
+        EditKind::Delete
+    } else {
+        EditKind::Replace
+    };
 
     match (options.find, options.replace_with) {
         (Some(find), Some(replace_with)) => {
