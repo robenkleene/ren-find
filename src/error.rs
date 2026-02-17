@@ -6,6 +6,12 @@ pub enum Error {
     File(#[from] std::io::Error),
     #[error("failed to move file: {0}")]
     TempfilePersist(#[from] tempfile::PersistError),
+    #[error(transparent)]
+    Output(#[from] crate::output::Error),
+    #[error(transparent)]
+    Edit(#[from] crate::edit::Error),
+    #[error(transparent)]
+    Writer(#[from] crate::writer::Error),
 }
 
 // pretty-print the error
