@@ -12,6 +12,8 @@ pub enum Error {
     Edit(#[from] crate::edit::Error),
     #[error(transparent)]
     Writer(#[from] crate::writer::Error),
+    #[error("{0}")]
+    InvalidArguments(String),
 }
 
 // pretty-print the error

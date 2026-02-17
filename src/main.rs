@@ -13,7 +13,6 @@ use replacer::Replacer;
 use std::env;
 use std::io::IsTerminal;
 
-
 #[derive(Debug)]
 enum EditKind {
     Replace,
@@ -55,12 +54,14 @@ fn main() -> Result<()> {
             .run(!options.write, delete_kind, color, pager)?;
         }
         (Some(_), None) => {
-            eprintln!("Error: missing replacement argument. Usage: ren <find> <replace_with>");
-            std::process::exit(2);
+            return Err(error::Error::InvalidArguments(
+                "missing replacement argument. Usage: ren <find> <replace_with>".into(),
+            ));
         }
         _ => {
-            eprintln!("Error: missing arguments. Usage: ren <find> <replace_with> or ren -d/-D");
-            std::process::exit(2);
+            return Err(error::Error::InvalidArguments(
+                "missing arguments. Usage: ren <find> <replace_with> or ren -d/-D".into(),
+            ));
         }
     }
     Ok(())

@@ -78,13 +78,13 @@ impl Writer {
             match delete_kind {
                 EditKind::Delete => {
                     if let Err(err) = Self::delete_path(path, false) {
-                        eprintln!("Error: {}", err);
+                        eprintln!("Error: failed to remove '{}': {}", path.display(), err);
                         had_error = true;
                     }
                 }
                 EditKind::DeleteAll => {
                     if let Err(err) = Self::delete_path(path, true) {
-                        eprintln!("Error: {}", err);
+                        eprintln!("Error: failed to remove '{}': {}", path.display(), err);
                         had_error = true;
                     }
                 }

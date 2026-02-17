@@ -201,6 +201,26 @@ mod cli {
     }
 
     #[test]
+    fn simple_delete_missing_stderr_includes_path() -> Result<()> {
+        let tmp_dir = tempfile::tempdir()?;
+        let tmp_dir_path = tmp_dir.path();
+        let command = ren()
+            .current_dir(tmp_dir_path)
+            .write_stdin("nonexistent_file\n")
+            .args(&["-d", "-w"])
+            .assert()
+            .failure();
+        let output = command.get_output();
+        let stderr = String::from_utf8_lossy(&output.stderr);
+        assert!(
+            stderr.contains("nonexistent_file"),
+            "stderr should include the file path, got: {}",
+            stderr
+        );
+        Ok(())
+    }
+
+    #[test]
     fn nested_delete() -> Result<()> {
         let input = fs::read_to_string("tests/data/nested/find.txt").expect("Error reading input");
         let tmp_dir = tempfile::tempdir()?;
