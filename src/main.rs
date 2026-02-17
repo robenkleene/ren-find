@@ -14,7 +14,6 @@ pub(crate) use error::Result;
 use replacer::Replacer;
 use std::env;
 use std::io::IsTerminal;
-use std::process;
 
 #[derive(Debug)]
 enum EditKind {
@@ -65,5 +64,5 @@ fn main() -> Result<()> {
         App::new(None)
         .run(!options.write, delete_kind, color, pager)?;
     }
-    process::exit(0);
+    Ok(())
 }

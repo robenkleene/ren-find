@@ -20,6 +20,8 @@ pub enum Error {
     TempfilePersist(#[from] tempfile::PersistError),
     #[error("missing source to destination mapping for replace operation")]
     MissingMapping,
+    #[error("some operations failed")]
+    PartialFailure,
 }
 
 impl Writer {
@@ -69,6 +71,7 @@ impl Writer {
     }
 
     pub(crate) fn write_file(&self, delete_kind: EditKind) -> Result<()> {
+        let mut had_error = false;
         for path in &self.paths {
             match delete_kind {
                 EditKind::Delete => {
@@ -79,6 +82,7 @@ impl Writer {
                                 path.display(),
                                 err
                             );
+                            had_error = true;
                         }
                     } else {
                         if let Err(err) = fs::remove_file(path) {
@@ -87,6 +91,7 @@ impl Writer {
                                 path.display(),
                                 err
                             );
+                            had_error = true;
                         }
                     }
                 }
@@ -98,6 +103,7 @@ impl Writer {
                                 path.display(),
                                 err
                             );
+                            had_error = true;
                         }
                     } else {
                         if let Err(err) = fs::remove_file(path) {
@@ -106,6 +112,7 @@ impl Writer {
                                 path.display(),
                                 err
                             );
+                            had_error = true;
                         }
                     }
                 }
@@ -125,9 +132,13 @@ impl Writer {
                             &dst.display(),
                             err
                         );
+                        had_error = true;
                     }
                 }
             };
+        }
+        if had_error {
+            return Err(Error::PartialFailure);
         }
         Ok(())
     }

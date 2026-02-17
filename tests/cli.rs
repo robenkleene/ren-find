@@ -193,7 +193,7 @@ mod cli {
             .write_stdin(input)
             .args(&["-d", "-w"])
             .assert()
-            .success();
+            .failure();
         let output = command.get_output();
         assert!(output.stderr.len() > 0);
         assert!(!Path::exists(&file_path_dst));
@@ -260,7 +260,7 @@ mod cli {
             .write_stdin(input)
             .args(&["-d", "-w"])
             .assert()
-            .success();
+            .failure();
         let output = command.get_output();
         assert!(output.stderr.len() > 0);
         assert!(!Path::exists(&file_path_dst));
