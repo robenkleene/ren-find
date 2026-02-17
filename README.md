@@ -29,6 +29,10 @@ cargo install ren-find
 
 The default pager is `less`, the `REN_PAGER` environment variable can be used to override the pager (e.g., `export REN_PAGER=delta` in Bash).
 
+## Special Characters
+
+Use `--` to separate options from arguments when the pattern starts with a hyphen (e.g., `ren -- '--foo' '--bar'`).
+
 ## Help
 
 `ren -h` (or `ren --help`, the full `--help` provides slightly longer explanations of some option) will list help for all the command-line flags.

@@ -1,7 +1,10 @@
 use clap::Parser;
 
 #[derive(Debug, Parser)]
-#[command(next_line_help = true)]
+#[command(next_line_help = true, after_help = "\
+SPECIAL CHARACTERS:
+  Use -- to separate options from arguments when the pattern starts
+  with a hyphen (e.g., ren -- '--foo' '--bar').")]
 pub(crate) struct Options {
     #[arg(short = 'w', long = "write")]
     /// Write the output to files directly (instead of outputting a patch)
@@ -52,3 +55,4 @@ pub(crate) struct Options {
     /// use captured values like $1, $2, etc.
     pub replace_with: Option<String>,
 }
+
