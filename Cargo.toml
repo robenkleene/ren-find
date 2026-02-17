@@ -27,7 +27,7 @@ shell-words = "1.1.0"
 grep-cli = "0.1.7"
 
 [dev-dependencies]
-assert_cmd = "1.0.3"
+assert_cmd = "2"
 anyhow = "1.0.38"
 
 [build-dependencies]
