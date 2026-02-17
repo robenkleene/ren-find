@@ -17,16 +17,8 @@ impl App {
             let stdin = std::io::stdin();
             let handle = stdin.lock();
 
-            // FIXME: Instantiating `output_type` and `write` should only happen if `preview` is true
-            let mut output_type = match OutputType::for_pager(pager, true) {
-                Ok(output_type) => output_type,
-                Err(_) => return Ok(()), // FIXME:
-            };
-
-            let write = match output_type.handle() {
-                Ok(write) => write,
-                Err(_) => return Ok(()), // FIXME:
-            };
+            let mut output_type = OutputType::for_pager(pager, true)?;
+            let write = output_type.handle()?;
 
             let mut sorted_paths = Vec::new();
             for line in handle.lines() {
@@ -47,27 +39,19 @@ impl App {
                 }
                 sorted_paths.push(key);
             }
-            sorted_paths.sort_by(|a, b| b.to_str().unwrap().len().cmp(&a.to_str().unwrap().len()));
+            sorted_paths.sort_by(|a, b| b.to_string_lossy().len().cmp(&a.to_string_lossy().len()));
             let mut src_to_dst: Option<IndexMap<PathBuf, PathBuf>> = None;
             if let Some(replacer) = &self.replacer {
                 let edit = Edit::new(&replacer);
-                src_to_dst = match edit.parse(&sorted_paths) {
-                    Ok(src_to_dst) => Some(src_to_dst),
-                    Err(_) => return Ok(()), // FIXME:
-                };
+                src_to_dst = Some(edit.parse(&sorted_paths)?);
             }
             if preview {
                 let writer = Writer::new(sorted_paths, src_to_dst);
-                let text = match writer.patch_preview(color, delete_kind) {
-                    Ok(text) => text,
-                    Err(_) => return Ok(()), // FIXME:
-                };
+                let text = writer.patch_preview(color, delete_kind)?;
                 write!(write, "{}", text)?;
             } else {
                 let writer = Writer::new(sorted_paths, src_to_dst);
-                if let Err(_) = writer.write_file(delete_kind) {
-                    return Ok(()); // FIXME:
-                }
+                writer.write_file(delete_kind)?;
             }
             drop(output_type);
         }

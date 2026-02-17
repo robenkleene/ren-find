@@ -1,56 +1,48 @@
-use structopt::{clap::AppSettings, StructOpt};
+use clap::Parser;
 
-#[derive(Debug, StructOpt)]
-#[structopt(
-    setting(AppSettings::ColoredHelp),
-    setting(AppSettings::NextLineHelp),
-    setting(AppSettings::UnifiedHelpMessage)
-)]
+#[derive(Debug, Parser)]
+#[command(next_line_help = true)]
 pub(crate) struct Options {
-    #[structopt(short = "w", long = "write")]
-    /** Write the output to files directly (instead of outputting a patch)
-
-If this flag is not present, and a patch is output, then the default pager is `less`. The
-environment variable REN_PAGER can be used to override the pager.
-    */
+    #[arg(short = 'w', long = "write")]
+    /// Write the output to files directly (instead of outputting a patch)
+    ///
+    /// If this flag is not present, and a patch is output, then the default pager is `less`. The
+    /// environment variable REN_PAGER can be used to override the pager.
     pub write: bool,
 
-    #[structopt(short = "d", long = "delete")]
+    #[arg(short = 'd', long = "delete")]
     /// Delete files and directories
     pub delete: bool,
 
-    #[structopt(short = "D", long = "delete-all")]
+    #[arg(short = 'D', long = "delete-all")]
     /// Delete files and directories, including directories that aren't empty
     pub delete_all: bool,
 
-    #[structopt(short = "s", long = "string-mode")]
+    #[arg(short = 's', long = "string-mode")]
     /// Treat expressions as non-regex strings
     pub literal_mode: bool,
 
-    #[structopt(short = "n")]
+    #[arg(short = 'n')]
     /// Limit the number of replacements per line
     pub replacements: Option<usize>,
 
-    #[structopt(long = "color")]
+    #[arg(long = "color")]
     /// Enable color (the default if the output is a TTY)
     pub color: bool,
 
-    #[structopt(long = "no-color")]
+    #[arg(long = "no-color")]
     /// Disable color
     pub no_color: bool,
 
-    #[structopt(short = "f", long = "flags", verbatim_doc_comment)]
-    #[rustfmt::skip]
-    /** Regex flags. May be combined (like `-f mc`)
-
-c - case-sensitive
-e - disable multi-line matching
-i - case-insensitive
-m - multi-line matching
-s - make `.` match newlines
-w - match full words only
-{n}{n}
-    */
+    #[arg(short = 'f', long = "flags", verbatim_doc_comment)]
+    /// Regex flags. May be combined (like `-f mc`)
+    ///
+    /// c - case-sensitive
+    /// e - disable multi-line matching
+    /// i - case-insensitive
+    /// m - multi-line matching
+    /// s - make `.` match newlines
+    /// w - match full words only
     pub flags: Option<String>,
 
     /// The regexp or string (if -s) to search for.

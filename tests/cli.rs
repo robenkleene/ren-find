@@ -193,10 +193,30 @@ mod cli {
             .write_stdin(input)
             .args(&["-d", "-w"])
             .assert()
-            .success();
+            .failure();
         let output = command.get_output();
         assert!(output.stderr.len() > 0);
         assert!(!Path::exists(&file_path_dst));
+        Ok(())
+    }
+
+    #[test]
+    fn simple_delete_missing_stderr_includes_path() -> Result<()> {
+        let tmp_dir = tempfile::tempdir()?;
+        let tmp_dir_path = tmp_dir.path();
+        let command = ren()
+            .current_dir(tmp_dir_path)
+            .write_stdin("nonexistent_file\n")
+            .args(&["-d", "-w"])
+            .assert()
+            .failure();
+        let output = command.get_output();
+        let stderr = String::from_utf8_lossy(&output.stderr);
+        assert!(
+            stderr.contains("nonexistent_file"),
+            "stderr should include the file path, got: {}",
+            stderr
+        );
         Ok(())
     }
 
@@ -260,7 +280,7 @@ mod cli {
             .write_stdin(input)
             .args(&["-d", "-w"])
             .assert()
-            .success();
+            .failure();
         let output = command.get_output();
         assert!(output.stderr.len() > 0);
         assert!(!Path::exists(&file_path_dst));

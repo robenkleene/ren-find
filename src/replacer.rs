@@ -1,4 +1,4 @@
-use crate::{utils, Result};
+use crate::Result;
 use regex::bytes::Regex;
 
 pub(crate) struct Replacer {
@@ -21,8 +21,8 @@ impl Replacer {
         } else {
             (
                 look_for,
-                utils::unescape(&replace_with)
-                    .unwrap_or_else(|| replace_with)
+                unescape::unescape(&replace_with)
+                    .unwrap_or(replace_with)
                     .into_bytes(),
             )
         };
