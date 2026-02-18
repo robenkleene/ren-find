@@ -29,6 +29,14 @@ impl Writer {
         Self { paths, src_to_dst }
     }
 
+    fn src_to_dst(&self) -> Result<&IndexMap<PathBuf, PathBuf>> {
+        self.src_to_dst.as_ref().ok_or(Error::MissingMapping)
+    }
+
+    fn should_skip(src: &Path, dst: &Path) -> bool {
+        src == dst || !Self::check(src, dst)
+    }
+
     pub(crate) fn patch_preview(&self, color: bool, delete_kind: EditKind) -> Result<String, crate::writer::Error> {
         let mut modified_paths: Vec<String> = Vec::new();
         let mut print_diff = false;
@@ -40,13 +48,10 @@ impl Writer {
             .collect::<Vec<_>>()
             .join("\n") + "\n";
         if let EditKind::Replace = delete_kind {
-            let src_to_dst = match &self.src_to_dst {
-              Some(src_to_dst) => src_to_dst,
-              None => return Err(Error::MissingMapping),
-            };
+            let src_to_dst = self.src_to_dst()?;
             for path in &self.paths {
                 let dst = &src_to_dst[path];
-                if path == dst || !Self::check(path, dst) {
+                if Self::should_skip(path, dst) {
                     let path_string = path.to_string_lossy();
                     modified_paths.push(path_string.to_string());
                     continue;
@@ -89,12 +94,9 @@ impl Writer {
                     }
                 }
                 EditKind::Replace => {
-                    let src_to_dst = match &self.src_to_dst {
-                      Some(src_to_dst) => src_to_dst,
-                      None => return Err(Error::MissingMapping),
-                    };
+                    let src_to_dst = self.src_to_dst()?;
                     let dst = &src_to_dst[path];
-                    if path == dst || !Self::check(path, dst) {
+                    if Self::should_skip(path, dst) {
                         continue;
                     }
                     if let Err(err) = fs::rename(path, dst) {
