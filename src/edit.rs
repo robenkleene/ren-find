@@ -7,7 +7,7 @@ use std::path::{Path, PathBuf};
 #[derive(Debug, thiserror::Error)]
 pub enum Error {
     #[error("Replace failed")]
-    ReplaceError(Utf8Error),
+    Replace(Utf8Error),
     #[error("invalid path: {0}")]
     InvalidPath(PathBuf),
     #[error("replacement produces empty filename for '{0}'")]
@@ -61,7 +61,7 @@ impl<'a> Edit<'a> {
         let filename_bytes = filename_string.as_bytes();
         let filename_replaced = self.replacer.replace(filename_bytes);
         let filename_replaced_string = std::str::from_utf8(&filename_replaced)
-            .map_err(|e| Error::ReplaceError(e))?;
+            .map_err(Error::Replace)?;
         if filename_replaced_string.is_empty() {
             return Err(Error::EmptyFilename(path.to_path_buf()));
         }
@@ -75,7 +75,7 @@ impl<'a> Edit<'a> {
         if path.to_string_lossy().as_bytes().last() == Some(&b'/') {
             dst_path.push("");
         }
-        Ok(PathBuf::from(dst_path))
+        Ok(dst_path)
     }
 }
 

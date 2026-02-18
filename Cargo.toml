@@ -37,6 +37,9 @@ clap = { version = "4", features = ["derive"] }
 clap_complete = "4"
 clap_mangen = "0.2"
 
+[lints.rust]
+unexpected_cfgs = { level = "warn", check-cfg = ['cfg(mov_cross_compile)'] }
+
 [profile.release]
 opt-level = 3
 lto = true

@@ -38,10 +38,10 @@ impl App {
             }
             sorted_paths.push(key);
         }
-        sorted_paths.sort_by(|a, b| b.to_string_lossy().len().cmp(&a.to_string_lossy().len()));
+        sorted_paths.sort_by_key(|p| std::cmp::Reverse(p.to_string_lossy().len()));
         let mut src_to_dst: Option<IndexMap<PathBuf, PathBuf>> = None;
         if let Some(replacer) = &self.replacer {
-            let edit = Edit::new(&replacer);
+            let edit = Edit::new(replacer);
             src_to_dst = Some(edit.parse(&sorted_paths)?);
         }
         if preview {
