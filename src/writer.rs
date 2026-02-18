@@ -118,7 +118,10 @@ impl Writer {
     }
 
     fn delete_path(path: &Path, recursive: bool) -> std::io::Result<()> {
-        if path.is_dir() {
+        let meta = fs::symlink_metadata(path)?;
+        if meta.is_symlink() {
+            fs::remove_file(path)
+        } else if meta.is_dir() {
             if recursive {
                 fs::remove_dir_all(path)
             } else {
@@ -130,11 +133,11 @@ impl Writer {
     }
 
     fn check(src: &Path, dst: &Path) -> bool {
-        if !src.is_file() && !src.is_dir() {
+        if fs::symlink_metadata(src).is_err() {
             eprintln!("Skipping {} because it doesn't exist", src.display());
             return false;
         }
-        if dst.is_file() || dst.is_dir() {
+        if fs::symlink_metadata(dst).is_ok() {
             eprintln!(
                 "Skipping {} because {} already exists",
                 src.display(),

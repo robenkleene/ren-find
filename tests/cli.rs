@@ -317,6 +317,26 @@ mod cli {
         Ok(())
     }
 
+    #[cfg(unix)]
+    #[test]
+    fn delete_symlink_not_target() -> Result<()> {
+        let tmp_dir = tempfile::tempdir()?;
+        let tmp_dir_path = tmp_dir.path();
+        let target = tmp_dir_path.join("target.txt");
+        fs::write(&target, "content").unwrap();
+        let link = tmp_dir_path.join("link.txt");
+        std::os::unix::fs::symlink(&target, &link).unwrap();
+        ren()
+            .current_dir(tmp_dir_path)
+            .write_stdin("link.txt\n")
+            .args(&["-d", "-w"])
+            .assert()
+            .success();
+        assert!(!link.exists());
+        assert!(target.exists());
+        Ok(())
+    }
+
     #[test]
     fn nested_delete_error() -> Result<()> {
         let input = fs::read_to_string("tests/data/nested/find.txt").expect("Error reading input");
