@@ -1,5 +1,13 @@
 use clap::Parser;
 
+fn parse_positive_usize(s: &str) -> std::result::Result<usize, String> {
+    let n: usize = s.parse().map_err(|e: std::num::ParseIntError| e.to_string())?;
+    if n == 0 {
+        return Err("-n expects a positive integer".into());
+    }
+    Ok(n)
+}
+
 #[derive(Debug, Parser)]
 #[command(version, next_line_help = true, after_help = "\
 SPECIAL CHARACTERS:
@@ -25,7 +33,7 @@ pub(crate) struct Options {
     /// Treat expressions as non-regex strings
     pub literal_mode: bool,
 
-    #[arg(short = 'n')]
+    #[arg(short = 'n', value_parser = parse_positive_usize)]
     /// Limit the number of replacements per line
     pub replacements: Option<usize>,
 

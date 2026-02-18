@@ -4,6 +4,7 @@
 mod cli {
     use anyhow::Result;
     use assert_cmd::Command;
+    use predicates;
     use std::fs;
     use std::path::Path;
 
@@ -250,6 +251,105 @@ mod cli {
             .success();
         assert!(!Path::exists(&file_path_dst));
         assert!(!Path::exists(&file_path_dst2));
+        Ok(())
+    }
+
+    #[test]
+    fn reject_duplicate_destinations_preview() -> Result<()> {
+        ren()
+            .write_stdin("foo1.txt\nfoo2.txt\n")
+            .args(&["[12]", ""])
+            .assert()
+            .failure()
+            .stderr(predicates::str::contains("same destination"));
+        Ok(())
+    }
+
+    #[test]
+    fn reject_duplicate_destinations_write() -> Result<()> {
+        let tmp_dir = tempfile::tempdir()?;
+        let tmp_dir_path = tmp_dir.path();
+        fs::write(tmp_dir_path.join("foo1.txt"), "").unwrap();
+        fs::write(tmp_dir_path.join("foo2.txt"), "").unwrap();
+        ren()
+            .current_dir(tmp_dir_path)
+            .write_stdin("foo1.txt\nfoo2.txt\n")
+            .args(&["[12]", "", "-w"])
+            .assert()
+            .failure()
+            .stderr(predicates::str::contains("same destination"));
+        // Both files should still exist (no operations performed)
+        assert!(tmp_dir_path.join("foo1.txt").exists());
+        assert!(tmp_dir_path.join("foo2.txt").exists());
+        Ok(())
+    }
+
+    #[test]
+    fn reject_slash_in_filename() -> Result<()> {
+        ren()
+            .write_stdin("foo.txt\n")
+            .args(&["foo", "bar/foo"])
+            .assert()
+            .failure()
+            .stderr(predicates::str::contains("containing '/'"));
+        Ok(())
+    }
+
+    #[test]
+    fn reject_empty_filename() -> Result<()> {
+        ren()
+            .write_stdin("foo.txt\n")
+            .args(&[".*", ""])
+            .assert()
+            .failure()
+            .stderr(predicates::str::contains("empty filename"));
+        Ok(())
+    }
+
+    #[test]
+    fn reject_n_zero() -> Result<()> {
+        ren()
+            .write_stdin("foo\n")
+            .args(&["-n", "0", "foo", "bar"])
+            .assert()
+            .failure()
+            .stderr(predicates::str::contains("-n expects a positive integer"));
+        Ok(())
+    }
+
+    #[test]
+    fn partial_failure_reports_counts() -> Result<()> {
+        let tmp_dir = tempfile::tempdir()?;
+        let tmp_dir_path = tmp_dir.path();
+        fs::write(tmp_dir_path.join("exists.txt"), "").unwrap();
+        // "missing.txt" intentionally does not exist
+        ren()
+            .current_dir(tmp_dir_path)
+            .write_stdin("exists.txt\nmissing.txt\n")
+            .args(&["-d", "-w"])
+            .assert()
+            .failure()
+            .stderr(predicates::str::contains("1 of 2 operations succeeded, 1 failed"));
+        Ok(())
+    }
+
+    #[cfg(unix)]
+    #[test]
+    fn delete_symlink_not_target() -> Result<()> {
+        let tmp_dir = tempfile::tempdir()?;
+        let tmp_dir_path = tmp_dir.path();
+        let target = tmp_dir_path.join("target.txt");
+        fs::write(&target, "content").unwrap();
+        let link = tmp_dir_path.join("link.txt");
+        std::os::unix::fs::symlink(&target, &link).unwrap();
+        ren()
+            .current_dir(tmp_dir_path)
+            .write_stdin("link.txt\n")
+            .args(&["-d", "-w"])
+            .assert()
+            .success();
+        assert!(!link.exists());
+        assert!(target.exists());
         Ok(())
     }
 

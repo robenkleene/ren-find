@@ -20,13 +20,21 @@ pub enum Error {
     TempfilePersist(#[from] tempfile::PersistError),
     #[error("missing source to destination mapping for replace operation")]
     MissingMapping,
-    #[error("some operations failed")]
-    PartialFailure,
+    #[error("{succeeded} of {total} operations succeeded, {failed} failed")]
+    PartialFailure { succeeded: usize, failed: usize, total: usize },
 }
 
 impl Writer {
     pub(crate) fn new(paths: Vec<PathBuf>, src_to_dst: Option<IndexMap<PathBuf, PathBuf>>) -> Self {
         Self { paths, src_to_dst }
+    }
+
+    fn src_to_dst(&self) -> Result<&IndexMap<PathBuf, PathBuf>> {
+        self.src_to_dst.as_ref().ok_or(Error::MissingMapping)
+    }
+
+    fn should_skip(src: &Path, dst: &Path) -> bool {
+        src == dst || !Self::check(src, dst)
     }
 
     pub(crate) fn patch_preview(&self, color: bool, delete_kind: EditKind) -> Result<String, crate::writer::Error> {
@@ -40,13 +48,10 @@ impl Writer {
             .collect::<Vec<_>>()
             .join("\n") + "\n";
         if let EditKind::Replace = delete_kind {
-            let src_to_dst = match &self.src_to_dst {
-              Some(src_to_dst) => src_to_dst,
-              None => return Err(Error::MissingMapping),
-            };
+            let src_to_dst = self.src_to_dst()?;
             for path in &self.paths {
                 let dst = &src_to_dst[path];
-                if path == dst || !Self::check(path, dst) {
+                if Self::should_skip(path, dst) {
                     let path_string = path.to_string_lossy();
                     modified_paths.push(path_string.to_string());
                     continue;
@@ -73,50 +78,69 @@ impl Writer {
     }
 
     pub(crate) fn write_file(&self, delete_kind: EditKind) -> Result<()> {
-        let mut had_error = false;
+        let mut succeeded: usize = 0;
+        let mut failed: usize = 0;
         for path in &self.paths {
             match delete_kind {
                 EditKind::Delete => {
                     if let Err(err) = Self::delete_path(path, false) {
                         eprintln!("Error: failed to remove '{}': {}", path.display(), err);
-                        had_error = true;
+                        failed += 1;
+                    } else {
+                        succeeded += 1;
                     }
                 }
                 EditKind::DeleteAll => {
                     if let Err(err) = Self::delete_path(path, true) {
                         eprintln!("Error: failed to remove '{}': {}", path.display(), err);
-                        had_error = true;
+                        failed += 1;
+                    } else {
+                        succeeded += 1;
                     }
                 }
                 EditKind::Replace => {
-                    let src_to_dst = match &self.src_to_dst {
-                      Some(src_to_dst) => src_to_dst,
-                      None => return Err(Error::MissingMapping),
-                    };
+                    let src_to_dst = self.src_to_dst()?;
                     let dst = &src_to_dst[path];
-                    if path == dst || !Self::check(path, dst) {
+                    if Self::should_skip(path, dst) {
                         continue;
                     }
                     if let Err(err) = fs::rename(path, dst) {
-                        eprintln!(
-                            "Error: failed to move '{}' to '{}', underlying error: {}",
-                            path.display(),
-                            dst.display(),
-                            err
-                        );
-                        had_error = true;
+                        if err.raw_os_error() == Some(libc::EXDEV) {
+                            eprintln!(
+                                "Error: cannot move '{}' to '{}': source and destination are on different filesystems",
+                                path.display(),
+                                dst.display(),
+                            );
+                        } else {
+                            eprintln!(
+                                "Error: failed to move '{}' to '{}', underlying error: {}",
+                                path.display(),
+                                dst.display(),
+                                err
+                            );
+                        }
+                        failed += 1;
+                    } else {
+                        succeeded += 1;
                     }
                 }
             };
         }
-        if had_error {
-            return Err(Error::PartialFailure);
+        if failed > 0 {
+            return Err(Error::PartialFailure {
+                succeeded,
+                failed,
+                total: succeeded + failed,
+            });
         }
         Ok(())
     }
 
     fn delete_path(path: &Path, recursive: bool) -> std::io::Result<()> {
-        if path.is_dir() {
+        let meta = fs::symlink_metadata(path)?;
+        if meta.is_symlink() {
+            fs::remove_file(path)
+        } else if meta.is_dir() {
             if recursive {
                 fs::remove_dir_all(path)
             } else {
@@ -128,11 +152,11 @@ impl Writer {
     }
 
     fn check(src: &Path, dst: &Path) -> bool {
-        if !src.is_file() && !src.is_dir() {
+        if fs::symlink_metadata(src).is_err() {
             eprintln!("Skipping {} because it doesn't exist", src.display());
             return false;
         }
-        if dst.is_file() || dst.is_dir() {
+        if fs::symlink_metadata(dst).is_ok() {
             eprintln!(
                 "Skipping {} because {} already exists",
                 src.display(),
