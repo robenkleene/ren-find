@@ -4,6 +4,7 @@
 mod cli {
     use anyhow::Result;
     use assert_cmd::Command;
+    use predicates;
     use std::fs;
     use std::path::Path;
 
@@ -250,6 +251,17 @@ mod cli {
             .success();
         assert!(!Path::exists(&file_path_dst));
         assert!(!Path::exists(&file_path_dst2));
+        Ok(())
+    }
+
+    #[test]
+    fn reject_n_zero() -> Result<()> {
+        ren()
+            .write_stdin("foo\n")
+            .args(&["-n", "0", "foo", "bar"])
+            .assert()
+            .failure()
+            .stderr(predicates::str::contains("-n expects a positive integer"));
         Ok(())
     }
 
