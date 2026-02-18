@@ -255,6 +255,17 @@ mod cli {
     }
 
     #[test]
+    fn reject_slash_in_filename() -> Result<()> {
+        ren()
+            .write_stdin("foo.txt\n")
+            .args(&["foo", "bar/foo"])
+            .assert()
+            .failure()
+            .stderr(predicates::str::contains("containing '/'"));
+        Ok(())
+    }
+
+    #[test]
     fn reject_empty_filename() -> Result<()> {
         ren()
             .write_stdin("foo.txt\n")

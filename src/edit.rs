@@ -11,6 +11,8 @@ pub enum Error {
     InvalidPath(PathBuf),
     #[error("replacement produces empty filename for '{0}'")]
     EmptyFilename(PathBuf),
+    #[error("replacement produces filename containing '/' for '{0}'")]
+    SlashInFilename(PathBuf),
 }
 
 pub(crate) struct Edit<'a> {
@@ -45,6 +47,9 @@ impl<'a> Edit<'a> {
             .map_err(|e| Error::ReplaceError(e))?;
         if filename_replaced_string.is_empty() {
             return Err(Error::EmptyFilename(path.to_path_buf()));
+        }
+        if filename_replaced_string.contains('/') {
+            return Err(Error::SlashInFilename(path.to_path_buf()));
         }
         let filename_dir = path.parent()
             .ok_or_else(|| Error::InvalidPath(path.to_path_buf()))?;
@@ -135,5 +140,21 @@ mod tests {
         assert!(result.is_err());
         let err = result.unwrap_err();
         assert!(matches!(err, Error::EmptyFilename(_)));
+    }
+
+    #[test]
+    fn reject_slash_in_filename() {
+        let replacer = Replacer::new(
+            "foo".into(),
+            "bar/foo".into(),
+            false,
+            None,
+            None,
+        ).unwrap();
+        let edit = Edit::new(&replacer);
+        let result = edit.replace_path(Path::new("foo.txt"));
+        assert!(result.is_err());
+        let err = result.unwrap_err();
+        assert!(matches!(err, Error::SlashInFilename(_)));
     }
 }
