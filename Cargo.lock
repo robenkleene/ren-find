@@ -497,6 +497,7 @@ dependencies = [
  "diffy-fork-filenames",
  "grep-cli",
  "indexmap",
+ "libc",
  "predicates",
  "regex",
  "shell-words",

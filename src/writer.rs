@@ -100,12 +100,20 @@ impl Writer {
                         continue;
                     }
                     if let Err(err) = fs::rename(path, dst) {
-                        eprintln!(
-                            "Error: failed to move '{}' to '{}', underlying error: {}",
-                            path.display(),
-                            dst.display(),
-                            err
-                        );
+                        if err.raw_os_error() == Some(libc::EXDEV) {
+                            eprintln!(
+                                "Error: cannot move '{}' to '{}': source and destination are on different filesystems",
+                                path.display(),
+                                dst.display(),
+                            );
+                        } else {
+                            eprintln!(
+                                "Error: failed to move '{}' to '{}', underlying error: {}",
+                                path.display(),
+                                dst.display(),
+                                err
+                            );
+                        }
                         had_error = true;
                     }
                 }
