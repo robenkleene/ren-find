@@ -317,6 +317,22 @@ mod cli {
         Ok(())
     }
 
+    #[test]
+    fn partial_failure_reports_counts() -> Result<()> {
+        let tmp_dir = tempfile::tempdir()?;
+        let tmp_dir_path = tmp_dir.path();
+        fs::write(tmp_dir_path.join("exists.txt"), "").unwrap();
+        // "missing.txt" intentionally does not exist
+        ren()
+            .current_dir(tmp_dir_path)
+            .write_stdin("exists.txt\nmissing.txt\n")
+            .args(&["-d", "-w"])
+            .assert()
+            .failure()
+            .stderr(predicates::str::contains("1 of 2 operations succeeded, 1 failed"));
+        Ok(())
+    }
+
     #[cfg(unix)]
     #[test]
     fn delete_symlink_not_target() -> Result<()> {

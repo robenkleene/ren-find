@@ -20,8 +20,8 @@ pub enum Error {
     TempfilePersist(#[from] tempfile::PersistError),
     #[error("missing source to destination mapping for replace operation")]
     MissingMapping,
-    #[error("some operations failed")]
-    PartialFailure,
+    #[error("{succeeded} of {total} operations succeeded, {failed} failed")]
+    PartialFailure { succeeded: usize, failed: usize, total: usize },
 }
 
 impl Writer {
@@ -78,19 +78,24 @@ impl Writer {
     }
 
     pub(crate) fn write_file(&self, delete_kind: EditKind) -> Result<()> {
-        let mut had_error = false;
+        let mut succeeded: usize = 0;
+        let mut failed: usize = 0;
         for path in &self.paths {
             match delete_kind {
                 EditKind::Delete => {
                     if let Err(err) = Self::delete_path(path, false) {
                         eprintln!("Error: failed to remove '{}': {}", path.display(), err);
-                        had_error = true;
+                        failed += 1;
+                    } else {
+                        succeeded += 1;
                     }
                 }
                 EditKind::DeleteAll => {
                     if let Err(err) = Self::delete_path(path, true) {
                         eprintln!("Error: failed to remove '{}': {}", path.display(), err);
-                        had_error = true;
+                        failed += 1;
+                    } else {
+                        succeeded += 1;
                     }
                 }
                 EditKind::Replace => {
@@ -114,13 +119,19 @@ impl Writer {
                                 err
                             );
                         }
-                        had_error = true;
+                        failed += 1;
+                    } else {
+                        succeeded += 1;
                     }
                 }
             };
         }
-        if had_error {
-            return Err(Error::PartialFailure);
+        if failed > 0 {
+            return Err(Error::PartialFailure {
+                succeeded,
+                failed,
+                total: succeeded + failed,
+            });
         }
         Ok(())
     }
