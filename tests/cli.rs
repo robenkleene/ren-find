@@ -1,10 +1,8 @@
 #[cfg(test)]
 #[cfg(not(mov_cross_compile))] // Cross-compilation does not allow to spawn threads but `command.assert()` would do.
-
 mod cli {
     use anyhow::Result;
     use assert_cmd::Command;
-    use predicates;
     use std::fs;
     use std::path::Path;
 
@@ -19,7 +17,7 @@ mod cli {
         ren()
             .current_dir("tests/data/multiple")
             .write_stdin(input)
-            .args(&["changes", "altered"])
+            .args(["changes", "altered"])
             .assert()
             .success()
             .stdout(result);
@@ -32,7 +30,7 @@ mod cli {
         ren()
             .current_dir("tests/data/missing")
             .write_stdin(input)
-            .args(&["missing", "replaced"])
+            .args(["missing", "replaced"])
             .assert()
             .success()
             .stdout("");
@@ -46,7 +44,7 @@ mod cli {
         ren()
             .current_dir("tests/data/simple")
             .write_stdin(input)
-            .args(&["changes", "altered"])
+            .args(["changes", "altered"])
             .assert()
             .success()
             .stdout(result);
@@ -60,7 +58,7 @@ mod cli {
         ren()
             .current_dir("tests/data/nested")
             .write_stdin(input)
-            .args(&["changes", "altered"])
+            .args(["changes", "altered"])
             .assert()
             .success()
             .stdout(result);
@@ -74,7 +72,7 @@ mod cli {
         ren()
             .current_dir("tests/data/dirs")
             .write_stdin(input)
-            .args(&["changes", "altered"])
+            .args(["changes", "altered"])
             .assert()
             .success()
             .stdout(result);
@@ -95,7 +93,7 @@ mod cli {
         ren()
             .current_dir(tmp_dir_path)
             .write_stdin(input)
-            .args(&["changes", "altered", "-w"])
+            .args(["changes", "altered", "-w"])
             .assert()
             .success();
         assert!(!Path::exists(&file_path_dst));
@@ -119,7 +117,7 @@ mod cli {
         ren()
             .current_dir(tmp_dir_path)
             .write_stdin(input)
-            .args(&["changes", "altered", "-w"])
+            .args(["changes", "altered", "-w"])
             .assert()
             .success();
         assert!(!Path::exists(&file_path_dst));
@@ -136,7 +134,7 @@ mod cli {
         ren()
             .current_dir("tests/data/simple")
             .write_stdin(input)
-            .args(&["-d"])
+            .args(["-d"])
             .assert()
             .success()
             .stdout(result);
@@ -150,7 +148,7 @@ mod cli {
         ren()
             .current_dir("tests/data/nested")
             .write_stdin(input)
-            .args(&["-d"])
+            .args(["-d"])
             .assert()
             .success()
             .stdout(result);
@@ -171,7 +169,7 @@ mod cli {
         ren()
             .current_dir(tmp_dir_path)
             .write_stdin(input)
-            .args(&["-d", "-w"])
+            .args(["-d", "-w"])
             .assert()
             .success();
         assert!(!Path::exists(&file_path_dst));
@@ -192,11 +190,11 @@ mod cli {
         let command = ren()
             .current_dir(tmp_dir_path)
             .write_stdin(input)
-            .args(&["-d", "-w"])
+            .args(["-d", "-w"])
             .assert()
             .failure();
         let output = command.get_output();
-        assert!(output.stderr.len() > 0);
+        assert!(!output.stderr.is_empty());
         assert!(!Path::exists(&file_path_dst));
         Ok(())
     }
@@ -208,7 +206,7 @@ mod cli {
         let command = ren()
             .current_dir(tmp_dir_path)
             .write_stdin("nonexistent_file\n")
-            .args(&["-d", "-w"])
+            .args(["-d", "-w"])
             .assert()
             .failure();
         let output = command.get_output();
@@ -246,7 +244,7 @@ mod cli {
         ren()
             .current_dir(tmp_dir_path)
             .write_stdin(input)
-            .args(&["-D", "-w"])
+            .args(["-D", "-w"])
             .assert()
             .success();
         assert!(!Path::exists(&file_path_dst));
@@ -258,7 +256,7 @@ mod cli {
     fn reject_duplicate_destinations_preview() -> Result<()> {
         ren()
             .write_stdin("foo1.txt\nfoo2.txt\n")
-            .args(&["[12]", ""])
+            .args(["[12]", ""])
             .assert()
             .failure()
             .stderr(predicates::str::contains("same destination"));
@@ -274,7 +272,7 @@ mod cli {
         ren()
             .current_dir(tmp_dir_path)
             .write_stdin("foo1.txt\nfoo2.txt\n")
-            .args(&["[12]", "", "-w"])
+            .args(["[12]", "", "-w"])
             .assert()
             .failure()
             .stderr(predicates::str::contains("same destination"));
@@ -288,7 +286,7 @@ mod cli {
     fn reject_slash_in_filename() -> Result<()> {
         ren()
             .write_stdin("foo.txt\n")
-            .args(&["foo", "bar/foo"])
+            .args(["foo", "bar/foo"])
             .assert()
             .failure()
             .stderr(predicates::str::contains("containing '/'"));
@@ -299,7 +297,7 @@ mod cli {
     fn reject_empty_filename() -> Result<()> {
         ren()
             .write_stdin("foo.txt\n")
-            .args(&[".*", ""])
+            .args([".*", ""])
             .assert()
             .failure()
             .stderr(predicates::str::contains("empty filename"));
@@ -310,7 +308,7 @@ mod cli {
     fn reject_n_zero() -> Result<()> {
         ren()
             .write_stdin("foo\n")
-            .args(&["-n", "0", "foo", "bar"])
+            .args(["-n", "0", "foo", "bar"])
             .assert()
             .failure()
             .stderr(predicates::str::contains("-n expects a positive integer"));
@@ -326,7 +324,7 @@ mod cli {
         ren()
             .current_dir(tmp_dir_path)
             .write_stdin("exists.txt\nmissing.txt\n")
-            .args(&["-d", "-w"])
+            .args(["-d", "-w"])
             .assert()
             .failure()
             .stderr(predicates::str::contains("1 of 2 operations succeeded, 1 failed"));
@@ -345,7 +343,7 @@ mod cli {
         ren()
             .current_dir(tmp_dir_path)
             .write_stdin("link.txt\n")
-            .args(&["-d", "-w"])
+            .args(["-d", "-w"])
             .assert()
             .success();
         assert!(!link.exists());
@@ -378,11 +376,11 @@ mod cli {
         let command = ren()
             .current_dir(tmp_dir_path)
             .write_stdin(input)
-            .args(&["-d", "-w"])
+            .args(["-d", "-w"])
             .assert()
             .failure();
         let output = command.get_output();
-        assert!(output.stderr.len() > 0);
+        assert!(!output.stderr.is_empty());
         assert!(!Path::exists(&file_path_dst));
         assert!(Path::exists(&file_path_dst2));
         Ok(())

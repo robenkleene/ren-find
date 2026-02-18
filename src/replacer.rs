@@ -87,7 +87,7 @@ impl Replacer {
 mod tests {
     use super::*;
 
-    fn replace<'a>(
+    fn replace(
         look_for: impl Into<String>,
         replace_with: impl Into<String>,
         literal: bool,
