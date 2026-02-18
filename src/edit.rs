@@ -1,4 +1,5 @@
 use crate::replacer::Replacer;
+use std::collections::HashMap;
 use std::str::Utf8Error;
 use indexmap::IndexMap;
 use std::path::{Path, PathBuf};
@@ -13,6 +14,8 @@ pub enum Error {
     EmptyFilename(PathBuf),
     #[error("replacement produces filename containing '/' for '{0}'")]
     SlashInFilename(PathBuf),
+    #[error("multiple source paths map to the same destination '{dst}': '{src1}' and '{src2}'")]
+    DuplicateDestination { dst: PathBuf, src1: PathBuf, src2: PathBuf },
 }
 
 pub(crate) struct Edit<'a> {
@@ -32,6 +35,20 @@ impl<'a> Edit<'a> {
         for path in paths {
             let dst = self.replace_path(path)?;
             src_to_dst.insert(path.clone(), dst);
+        }
+        let mut seen: HashMap<&PathBuf, &PathBuf> = HashMap::new();
+        for (src, dst) in &src_to_dst {
+            if src == dst {
+                continue;
+            }
+            if let Some(prev_src) = seen.get(dst) {
+                return Err(Error::DuplicateDestination {
+                    dst: dst.clone(),
+                    src1: (*prev_src).clone(),
+                    src2: src.clone(),
+                });
+            }
+            seen.insert(dst, src);
         }
         Ok(src_to_dst)
     }
@@ -156,5 +173,22 @@ mod tests {
         assert!(result.is_err());
         let err = result.unwrap_err();
         assert!(matches!(err, Error::SlashInFilename(_)));
+    }
+
+    #[test]
+    fn reject_duplicate_destinations() {
+        let replacer = Replacer::new(
+            "[12]".into(),
+            "".into(),
+            false,
+            None,
+            None,
+        ).unwrap();
+        let edit = Edit::new(&replacer);
+        let paths = vec![PathBuf::from("foo1.txt"), PathBuf::from("foo2.txt")];
+        let result = edit.parse(&paths);
+        assert!(result.is_err());
+        let err = result.unwrap_err();
+        assert!(matches!(err, Error::DuplicateDestination { .. }));
     }
 }

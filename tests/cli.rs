@@ -255,6 +255,36 @@ mod cli {
     }
 
     #[test]
+    fn reject_duplicate_destinations_preview() -> Result<()> {
+        ren()
+            .write_stdin("foo1.txt\nfoo2.txt\n")
+            .args(&["[12]", ""])
+            .assert()
+            .failure()
+            .stderr(predicates::str::contains("same destination"));
+        Ok(())
+    }
+
+    #[test]
+    fn reject_duplicate_destinations_write() -> Result<()> {
+        let tmp_dir = tempfile::tempdir()?;
+        let tmp_dir_path = tmp_dir.path();
+        fs::write(tmp_dir_path.join("foo1.txt"), "").unwrap();
+        fs::write(tmp_dir_path.join("foo2.txt"), "").unwrap();
+        ren()
+            .current_dir(tmp_dir_path)
+            .write_stdin("foo1.txt\nfoo2.txt\n")
+            .args(&["[12]", "", "-w"])
+            .assert()
+            .failure()
+            .stderr(predicates::str::contains("same destination"));
+        // Both files should still exist (no operations performed)
+        assert!(tmp_dir_path.join("foo1.txt").exists());
+        assert!(tmp_dir_path.join("foo2.txt").exists());
+        Ok(())
+    }
+
+    #[test]
     fn reject_slash_in_filename() -> Result<()> {
         ren()
             .write_stdin("foo.txt\n")
