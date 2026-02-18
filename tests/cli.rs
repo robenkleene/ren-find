@@ -9,7 +9,7 @@ mod cli {
     use std::path::Path;
 
     fn ren() -> Command {
-        Command::cargo_bin("ren").expect("Error invoking ren")
+        assert_cmd::cargo::cargo_bin_cmd!("ren")
     }
 
     #[test]
