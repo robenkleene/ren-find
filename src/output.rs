@@ -8,18 +8,10 @@ use super::less::retrieve_less_version;
 #[derive(Debug)]
 #[derive(thiserror::Error)]
 pub enum Error {
-    #[error("Could not parse pager command")]
+    #[error("Could not parse pager command: {0}")]
     ParseError(String),
     #[error("Could not open STDIN for pager")]
     PagerError,
-}
-
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-#[allow(dead_code)]
-pub enum PagingMode {
-    Always,
-    QuitIfOneScreen,
-    Never,
 }
 
 pub enum OutputType {
