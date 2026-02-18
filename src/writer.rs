@@ -14,10 +14,6 @@ pub(crate) struct Writer {
 pub enum Error {
     #[error(transparent)]
     File(#[from] std::io::Error),
-    #[error(transparent)]
-    String(#[from] std::str::Utf8Error),
-    #[error("failed to move file: {0}")]
-    TempfilePersist(#[from] tempfile::PersistError),
     #[error("missing source to destination mapping for replace operation")]
     MissingMapping,
     #[error("{succeeded} of {total} operations succeeded, {failed} failed")]

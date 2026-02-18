@@ -27,6 +27,12 @@ impl Replacer {
             )
         };
 
+        let look_for = if flags.as_ref().is_some_and(|f| f.contains('w')) {
+            format!("\\b{}\\b", look_for)
+        } else {
+            look_for
+        };
+
         let mut regex = regex::bytes::RegexBuilder::new(&look_for);
         regex.multi_line(true);
 
@@ -43,12 +49,6 @@ impl Replacer {
                             regex.multi_line(false);
                         }
                         regex.dot_matches_new_line(true);
-                    },
-                    'w' => {
-                        regex = regex::bytes::RegexBuilder::new(&format!(
-                            "\\b{}\\b",
-                            look_for
-                        ));
                     },
                     _ => {},
                 };
@@ -143,5 +143,11 @@ mod tests {
     #[test]
     fn full_word_replace() {
         replace("abc", "def", false, Some("w"), "abcd abc", "abcd def");
+    }
+
+    #[test]
+    fn full_word_case_insensitive() {
+        replace("abc", "def", false, Some("iw"), "abcd ABC", "abcd def");
+        replace("abc", "def", false, Some("wi"), "abcd ABC", "abcd def");
     }
 }
