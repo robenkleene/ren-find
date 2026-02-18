@@ -9,6 +9,8 @@ pub enum Error {
     ReplaceError(Utf8Error),
     #[error("invalid path: {0}")]
     InvalidPath(PathBuf),
+    #[error("replacement produces empty filename for '{0}'")]
+    EmptyFilename(PathBuf),
 }
 
 pub(crate) struct Edit<'a> {
@@ -41,6 +43,9 @@ impl<'a> Edit<'a> {
         let filename_replaced = self.replacer.replace(filename_bytes);
         let filename_replaced_string = std::str::from_utf8(&filename_replaced)
             .map_err(|e| Error::ReplaceError(e))?;
+        if filename_replaced_string.is_empty() {
+            return Err(Error::EmptyFilename(path.to_path_buf()));
+        }
         let filename_dir = path.parent()
             .ok_or_else(|| Error::InvalidPath(path.to_path_buf()))?;
         let mut dst_path = filename_dir.join(filename_replaced_string);
@@ -114,5 +119,21 @@ mod tests {
     #[test]
     fn replace_path_slashes() {
         replace_path("changes", "altered", &PathBuf::from("stays/"), &PathBuf::from("stays"))
+    }
+
+    #[test]
+    fn reject_empty_filename() {
+        let replacer = Replacer::new(
+            ".*".into(),
+            "".into(),
+            false,
+            None,
+            None,
+        ).unwrap();
+        let edit = Edit::new(&replacer);
+        let result = edit.replace_path(Path::new("foo.txt"));
+        assert!(result.is_err());
+        let err = result.unwrap_err();
+        assert!(matches!(err, Error::EmptyFilename(_)));
     }
 }

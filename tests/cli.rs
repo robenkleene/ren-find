@@ -255,6 +255,17 @@ mod cli {
     }
 
     #[test]
+    fn reject_empty_filename() -> Result<()> {
+        ren()
+            .write_stdin("foo.txt\n")
+            .args(&[".*", ""])
+            .assert()
+            .failure()
+            .stderr(predicates::str::contains("empty filename"));
+        Ok(())
+    }
+
+    #[test]
     fn reject_n_zero() -> Result<()> {
         ren()
             .write_stdin("foo\n")
