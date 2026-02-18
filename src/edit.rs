@@ -83,7 +83,7 @@ impl<'a> Edit<'a> {
 mod tests {
     use super::*;
 
-    fn parse<'a>(
+    fn parse(
         look_for: impl Into<String>,
         replace_with: impl Into<String>,
         paths: &[PathBuf],
@@ -104,7 +104,7 @@ mod tests {
         );
     }
 
-    fn replace_path<'a>(
+    fn replace_path(
         look_for: impl Into<String>,
         replace_with: impl Into<String>,
         src: &Path,
@@ -132,9 +132,9 @@ mod tests {
             (PathBuf::from("changes/stays"), PathBuf::from("changes/stays")),
             (PathBuf::from("stays"), PathBuf::from("stays")),
         ]);
-        let mut paths: Vec<PathBuf> = ["changes", "changes/stays", "stays"].iter().map(|a| PathBuf::from(a)).collect();
+        let mut paths: Vec<PathBuf> = ["changes", "changes/stays", "stays"].iter().map(PathBuf::from).collect();
         // Input needs to be sorted
-        paths.sort_by(|a, b| b.to_str().unwrap().len().cmp(&a.to_str().unwrap().len()));
+        paths.sort_by_key(|b| std::cmp::Reverse(b.to_str().unwrap().len()));
         parse("changes", "altered", &paths, expected);
     }
 
