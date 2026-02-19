@@ -15,10 +15,7 @@ SPECIAL CHARACTERS:
   with a hyphen (e.g., ren -- '--foo' '--bar').")]
 pub(crate) struct Options {
     #[arg(short = 'w', long = "write")]
-    /// Write the output to files directly (instead of outputting a patch)
-    ///
-    /// If this flag is not present, and a patch is output, then the default pager is `less`. The
-    /// environment variable REN_PAGER can be used to override the pager.
+    /// Write the output to files directly (instead of outputting a patch). If this flag is not present, and a patch is output, then the default pager is 'less'. The environment variable REN_PAGER can be used to override the pager
     pub write: bool,
 
     #[arg(short = 'd', long = "delete")]
@@ -45,22 +42,14 @@ pub(crate) struct Options {
     /// Disable color
     pub no_color: bool,
 
-    #[arg(short = 'f', long = "flags", verbatim_doc_comment)]
-    /// Regex flags. May be combined (like `-f mc`)
-    ///
-    /// c - case-sensitive
-    /// e - disable multi-line matching
-    /// i - case-insensitive
-    /// m - multi-line matching
-    /// s - make `.` match newlines
-    /// w - match full words only
+    #[arg(short = 'f', long = "flags")]
+    /// Regex flags, may be combined (like '-f mc'). 'c': case-sensitive, 'e': disable multi-line matching, 'i': case-insensitive, 'm': multi-line matching, 's': make '.' match newlines, 'w': match full words only
     pub flags: Option<String>,
 
-    /// The regexp or string (if -s) to search for.
+    /// The regexp or string (if -s) to search for
     pub find: Option<String>,
 
-    /// What to replace each match with. Unless in string mode, you may
-    /// use captured values like $1, $2, etc.
+    /// What to replace each match with. Unless in string mode, you may use captured values like $1, $2, etc
     pub replace_with: Option<String>,
 }
 
