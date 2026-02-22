@@ -20,7 +20,14 @@ find . -name '*foo*' | ren -w foo bar
 
 ## Installation
 
-`ren` is available via [`cargo`](https://github.com/rust-lang/cargo):
+### Homebrew
+
+```
+brew tap robenkleene/tap
+brew install ren-find
+```
+
+### Cargo
 
 ```
 cargo install ren-find
